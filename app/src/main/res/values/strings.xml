@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">hfapp_kotlin</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="button_toast">Toast</string>
+    <string name="button_random">Random</string>
+    <string name="button_count">Count</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
+    <string name="title_empty">0</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="random_heading">Here is a random number between 0 and %1d.</string>
+    <string name="random_label">R</string>
+    <string name="na_placeholder">N/A</string>
+
+    <string name="meas_type_label">Type</string>
+    <string name="meas_type_lte">LTE</string>
+    <string name="meas_type_wcdma">WCDMA</string>
+    <string name="meas_type_cdma">CDMA</string>
+    <string name="meas_type_gsm">GSM</string>
+
+    <string name="meas_rsrp_label">RSRP</string>
+    <string name="meas_rsrq_label">RSRQ</string>
+    <string name="meas_rssnr_label">RSSNR</string>
+    <string name="meas_rssnr_label_long">Refernce Signal Signal to Noise Ratio</string>
+    <string name="meas_cqi_label">CQI</string>
+    <string name="meas_cqi_label_long">Channgel Quality Indicator</string>
+    <string name="meas_ta_label">TA</string>
+    <string name="meas_ta_label_long">Timing Advance</string>
+
+    <string name="meas_status_label">Status</string>
+    <string name="meas_freq_label">Band</string>
+    <string name="meas_mcc_label">MCC</string>
+    <string name="meas_mnc_label">MNC</string>
+    <string name="meas_pci_label">PCI</string>
+    <string name="meas_time_label">Time</string>
+
+
+</resources>
