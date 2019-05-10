@@ -14,8 +14,8 @@ class MeasurementPoint {
     var type: String = ""
     var status: String = NAN.toString()
     var band: Int = NAN
-    var mcc: Int = NAN
-    var mnc: Int = NAN
+    var mcc: String = NAN.toString()
+    var mnc: String = NAN.toString()
     var pci: Int = NAN
     var rsrp: Int = NAN
     var rsrq: Int = NAN
@@ -80,32 +80,45 @@ class MeasurementPoint {
             is CellInfoLte -> {
                 type = "LTE"
                 band = cellInfo.cellIdentity.earfcn
-                mcc = cellInfo.cellIdentity.mcc
-                mnc = cellInfo.cellIdentity.mnc
                 pci = cellInfo.cellIdentity.pci
                 ta = cellInfo.cellSignalStrength.timingAdvance
-
                 if (Build.VERSION.SDK_INT >= 26) {
                     cqi = cellInfo.cellSignalStrength.cqi
                     rsrp = cellInfo.cellSignalStrength.rsrp
                     rsrq = cellInfo.cellSignalStrength.rsrq
                     rssnr = cellInfo.cellSignalStrength.rssnr
                 }
-
+                if (Build.VERSION.SDK_INT >= 28) {
+                    mcc = cellInfo.cellIdentity.mccString
+                    mnc = cellInfo.cellIdentity.mncString
+                } else {
+                    mcc = cellInfo.cellIdentity.mcc.toString()
+                    mnc = cellInfo.cellIdentity.mnc.toString()
+                }
             }
             is CellInfoWcdma ->  {
                 type = "WCDMA"
                 band = cellInfo.cellIdentity.uarfcn
-                mcc = cellInfo.cellIdentity.mcc
-                mnc = cellInfo.cellIdentity.mnc
                 rsrp = cellInfo.cellSignalStrength.dbm
+                if (Build.VERSION.SDK_INT >= 28) {
+                    mcc = cellInfo.cellIdentity.mccString
+                    mnc = cellInfo.cellIdentity.mncString
+                } else {
+                    mcc = cellInfo.cellIdentity.mcc.toString()
+                    mnc = cellInfo.cellIdentity.mnc.toString()
+                }
             }
             is CellInfoGsm -> {
                 type = "GSM"
                 band = cellInfo.cellIdentity.arfcn
-                mcc = cellInfo.cellIdentity.mcc
-                mnc = cellInfo.cellIdentity.mnc
                 rsrp = cellInfo.cellSignalStrength.dbm
+                if (Build.VERSION.SDK_INT >= 28) {
+                    mcc = cellInfo.cellIdentity.mccString
+                    mnc = cellInfo.cellIdentity.mncString
+                } else {
+                    mcc = cellInfo.cellIdentity.mcc.toString()
+                    mnc = cellInfo.cellIdentity.mnc.toString()
+                }
                 if (Build.VERSION.SDK_INT >= 26) {
                     ta = cellInfo.cellSignalStrength.timingAdvance
                 }
