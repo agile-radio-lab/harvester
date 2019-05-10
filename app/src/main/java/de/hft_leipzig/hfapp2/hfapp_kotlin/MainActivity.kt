@@ -42,30 +42,6 @@ class MainActivity : AppCompatActivity() {
     }
     private var isStarted = false
     private val csvHeader = "timestamp,type,status,band,mcc,mnc,pci,rsrp,rsrq,rssnr,ta,cqi"
-//
-//    fun toastMe(view: View) {
-//        val myToast = Toast.makeText(this, "Hello Toast!", Toast.LENGTH_SHORT)
-//        myToast.show()
-//    }
-
-    fun randomMe(view: View) {
-//        val count: Int = getCount()
-        val randomIntent = Intent(this, SecondActivity::class.java)
-        randomIntent.putExtra(SecondActivity.TOTAL_COUNT, 1)
-        startActivity(randomIntent)
-    }
-
-    fun start(view: View) {
-        val buttonView = findViewById<TextView>(R.id.button_start)
-        if (isStarted) {
-            buttonView.text = resources.getString(R.string.button_start)
-            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
-        } else {
-            buttonView.text = resources.getString(R.string.button_stop)
-            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_CELL_INFO or PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
-        }
-        isStarted = !isStarted
-    }
 
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
@@ -96,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createHeaderTableRow(): TableRow {
+    private fun createCellInfoTableHeader(): TableRow {
         val row = TableRow(this)
         val layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT)
         row.layoutParams = layoutParams
@@ -233,7 +209,7 @@ class MainActivity : AppCompatActivity() {
 
         val table: TableLayout = findViewById(R.id.tableResults)
         table.removeAllViews()
-        val headerRow = createHeaderTableRow()
+        val headerRow = createCellInfoTableHeader()
         table.addView(headerRow)
         for (cellInfo in allCellInfo) {
             if (cellInfo == null) {
@@ -244,6 +220,30 @@ class MainActivity : AppCompatActivity() {
             val newRow = createCellInfoTableRow(mp)
             table.addView(newRow)
         }
+    }
+//
+//    fun toastMe(view: View) {
+//        val myToast = Toast.makeText(this, "Hello Toast!", Toast.LENGTH_SHORT)
+//        myToast.show()
+//    }
+
+    fun randomMe(view: View) {
+//        val count: Int = getCount()
+        val randomIntent = Intent(this, SecondActivity::class.java)
+        randomIntent.putExtra(SecondActivity.TOTAL_COUNT, 1)
+        startActivity(randomIntent)
+    }
+
+    fun start(view: View) {
+        val buttonView = findViewById<TextView>(R.id.button_start)
+        if (isStarted) {
+            buttonView.text = resources.getString(R.string.button_start)
+            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+        } else {
+            buttonView.text = resources.getString(R.string.button_stop)
+            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_CELL_INFO or PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
+        }
+        isStarted = !isStarted
     }
 
     fun getMeasurement(view: View) {
