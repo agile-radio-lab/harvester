@@ -1,12 +1,11 @@
 <resources>
     <string name="app_name">hfapp_kotlin</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="button_toast">Toast</string>
-    <string name="button_random">Random</string>
-    <string name="button_count">Count</string>
+    <string name="button_update">Update</string>
     <string name="button_start">Start</string>
+    <string name="button_record">Record</string>
+    <string name="button_list">Record</string>
+    <string name="button_pause">Pause</string>
     <string name="button_stop">Stop</string>
     <string name="title_empty">0</string>
 
@@ -14,6 +13,13 @@
     <string name="random_heading">Here is a random number between 0 and %1d.</string>
     <string name="random_label">R</string>
     <string name="na_placeholder">N/A</string>
+
+    <string name="meas_latitude_label">Lat</string>
+    <string name="meas_longitude_label">Lon</string>
+
+    <string name="meas_latitude_value">Lat: %1$.4f</string>
+    <string name="meas_longitude_value">Lon: %1$.4f</string>
+    <string name="meas_accuracy_value">Acc: %1$.2f</string>
 
     <string name="meas_type_label">Type</string>
     <string name="meas_type_lte">LTE</string>
@@ -36,6 +42,7 @@
     <string name="meas_mnc_label">MNC</string>
     <string name="meas_pci_label">PCI</string>
     <string name="meas_time_label">Time</string>
+    <string name="permission_needed">Application needs location permissions</string>
 
 
 </resources>

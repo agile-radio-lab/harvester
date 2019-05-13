@@ -1,259 +1,277 @@
 package de.hft_leipzig.hfapp2.hfapp_kotlin
 
-import android.Manifest
+import android.app.ActivityManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.icu.util.Measure
-import android.os.Build
-import android.os.Bundle
-import android.os.Debug
-import android.support.annotation.RequiresApi
+import android.os.*
 import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.telephony.*
-import android.telephony.CellInfo.*
-import android.util.Log
-import android.view.View
-import android.widget.TableLayout
-import android.widget.TableRow
-import android.widget.TextView
-import android.widget.Toast
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.util.*
-import android.os.SystemClock
+import android.support.v4.widget.SwipeRefreshLayout
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import com.facebook.stetho.Stetho
+import android.os.Build
+import android.view.View
+import android.widget.*
 
-const val PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 0x2
+
+const val PERMISSIONS_REQUEST_ALL = 0x1
+
+var ALL_PERMISSIONS = arrayOf(
+    android.Manifest.permission.ACCESS_COARSE_LOCATION,
+    android.Manifest.permission.ACCESS_FINE_LOCATION
+)
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var tm: TelephonyManager
-    private var phoneStateListener: PhoneStateListener = object : PhoneStateListener() {
-        override fun onSignalStrengthsChanged(signalStrength: SignalStrength) {
-            super.onSignalStrengthsChanged(signalStrength)
-            getAllCellInfo()
-        }
+    var myService: MeasurementService? = null
+    var isBound = false
 
-        override fun onCellInfoChanged(cellInfo: MutableList<CellInfo>?) {
-            super.onCellInfoChanged(cellInfo)
-            getAllCellInfo()
-        }
-    }
     private var isStarted = false
-    private val csvHeader = "timestamp,type,status,band,mcc,mnc,pci,rsrp,rsrq,rssnr,ta,cqi"
+    private val mainHandler = Handler()
+    private lateinit var backgroundTask: Runnable
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    getAllCellInfo()
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+    private val myConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as MeasurementService.MyLocalBinder
+            myService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            isBound = false
+        }
+    }
+
+    private fun hasPermissions(context: Context?, permissions: Array<String>): Boolean {
+        if (context != null) {
+            for (permission in permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false
                 }
-                return
-            }
-            else -> {
-                // Ignore all other requests.
             }
         }
+        return true
     }
 
-    private fun getPermissions() {
-        val hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-
-        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION)
-        } else {
-            getAllCellInfo()
+    private fun getPermissions(): Boolean {
+        if (!hasPermissions(this, ALL_PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, ALL_PERMISSIONS, PERMISSIONS_REQUEST_ALL)
+            return false
         }
+        return true
     }
 
-    private fun createCellInfoTableHeader(): TableRow {
+    private fun createCellInfoTableHeader(rightPadding: Int = 20, fontSize: Float = 10.0f): TableRow {
         val row = TableRow(this)
         val layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT)
         row.layoutParams = layoutParams
 
-        val rightPadding = 20
+        val columns: ArrayList<TextView> = ArrayList()
+        columns.add(createTextViewCell(this, getString(R.string.meas_time_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_status_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_freq_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_pci_label), rightPadding, fontSize))
 
-        val tvTime = TextView(this)
-        tvTime.setPadding(3,3,rightPadding,3)
-        tvTime.text = resources.getString(R.string.meas_time_label)
-        val tvType = TextView(this)
-        tvType.setPadding(3,3,rightPadding,3)
-        tvType.text = resources.getString(R.string.meas_type_label)
-        val tvStatus  = TextView(this)
-        tvStatus.setPadding(3,3,rightPadding,3)
-        tvStatus.text = resources.getString(R.string.meas_status_label)
-        val tvFreq = TextView(this)
-        tvFreq.setPadding(3,3,rightPadding,3)
-        tvFreq.text = resources.getString(R.string.meas_freq_label)
-        val tvMcc  = TextView(this)
-        tvMcc.setPadding(3,3,rightPadding,3)
-        tvMcc.text = resources.getString(R.string.meas_mcc_label)
-        val tvMnc  = TextView(this)
-        tvMnc.setPadding(3,3,rightPadding,3)
-        tvMnc.text = resources.getString(R.string.meas_mnc_label)
-        val tvPci  = TextView(this)
-        tvPci.setPadding(3,3,rightPadding,3)
-        tvPci.text = resources.getString(R.string.meas_pci_label)
+        columns.add(createTextViewCell(this, getString(R.string.meas_rsrp_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_rsrq_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_rssnr_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_ta_label), rightPadding, fontSize))
+        columns.add(createTextViewCell(this, getString(R.string.meas_cqi_label), rightPadding, fontSize))
 
-        val tvRsrp  = TextView(this)
-        tvRsrp.setPadding(3,3,rightPadding,3)
-        tvRsrp.text = resources.getString(R.string.meas_rsrp_label)
-        val tvRsrq  = TextView(this)
-        tvRsrq.setPadding(3,3,rightPadding,3)
-        tvRsrq.text = resources.getString(R.string.meas_rsrq_label)
-        val tvRssnr  = TextView(this)
-        tvRssnr.setPadding(3,3,rightPadding,3)
-        tvRssnr.text = resources.getString(R.string.meas_rssnr_label)
-        val tvTa  = TextView(this)
-        tvTa.setPadding(3,3,rightPadding,3)
-        tvTa.text = resources.getString(R.string.meas_ta_label)
-        val tvCqi  = TextView(this)
-        tvCqi.setPadding(3,3,rightPadding,3)
-        tvCqi.text = resources.getString(R.string.meas_cqi_label)
-
-        row.addView(tvTime)
-        row.addView(tvType)
-        row.addView(tvStatus)
-        row.addView(tvFreq)
-        row.addView(tvMcc)
-        row.addView(tvMnc)
-        row.addView(tvPci)
-        row.addView(tvRsrp)
-        row.addView(tvRsrq)
-        row.addView(tvRssnr)
-        row.addView(tvTa)
-        row.addView(tvCqi)
-
+        for (c in columns) {
+            row.addView(c)
+        }
         return row
     }
 
-    private fun createCellInfoTableRow(mp: MeasurementPoint): TableRow {
-        val row = TableRow(this)
-        val layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT)
-        row.layoutParams = layoutParams
-
-        val rightPadding = 20
-
-        val tvTime = TextView(this)
-        tvTime.setPadding(3,3,rightPadding,3)
-        val tvType = TextView(this)
-        tvType.setPadding(3,3,rightPadding,3)
-        val tvStatus  = TextView(this)
-        tvStatus.setPadding(3,3,rightPadding,3)
-        val tvFreq = TextView(this)
-        tvFreq.setPadding(3,3,rightPadding,3)
-        val tvMcc  = TextView(this)
-        tvMcc.setPadding(3,3,rightPadding,3)
-        val tvMnc  = TextView(this)
-        tvMnc.setPadding(3,3,rightPadding,3)
-        val tvPci  = TextView(this)
-        tvPci.setPadding(3,3,rightPadding,3)
-
-        val tvRsrp  = TextView(this)
-        tvRsrp.setPadding(3,3,rightPadding,3)
-        val tvRsrq  = TextView(this)
-        tvRsrq.setPadding(3,3,rightPadding,3)
-        val tvRssnr  = TextView(this)
-        tvRssnr.setPadding(3,3,rightPadding,3)
-        val tvTa  = TextView(this)
-        tvTa.setPadding(3,3,rightPadding,3)
-        val tvCqi  = TextView(this)
-        tvCqi.setPadding(3,3,rightPadding,3)
-
-        tvTime.text = mp.datetime
-        tvType.text = mp.strOrNan(mp.type)
-        tvStatus.text = mp.strOrNan(mp.status)
-        tvFreq.text = mp.strOrNan(mp.band)
-        tvMcc.text = mp.strOrNan(mp.mcc)
-        tvMnc.text = mp.strOrNan(mp.mnc)
-        tvPci.text = mp.strOrNan(mp.pci)
-        tvRsrp.text = mp.strOrNan(mp.rsrp)
-        tvRsrq.text = mp.strOrNan(mp.rsrq)
-        tvRssnr.text = mp.strOrNan(mp.rssnr)
-        tvTa.text = mp.strOrNan(mp.ta)
-        tvCqi.text = mp.strOrNan(mp.cqi)
-
-        row.addView(tvTime)
-        row.addView(tvType)
-        row.addView(tvStatus)
-        row.addView(tvFreq)
-        row.addView(tvMcc)
-        row.addView(tvMnc)
-        row.addView(tvPci)
-        row.addView(tvRsrp)
-        row.addView(tvRsrq)
-        row.addView(tvRssnr)
-        row.addView(tvTa)
-        row.addView(tvCqi)
-        return row
-    }
-
-    private fun getAllCellInfo() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            getPermissions()
+    private fun getMeasurements() {
+        if (!hasPermissions(this, ALL_PERMISSIONS)) {
             return
         }
-        val allCellInfo = tm.allCellInfo
-
-
-        if (allCellInfo.size == 0) {
-            return
-        }
-
         val table: TableLayout = findViewById(R.id.tableResults)
         table.removeAllViews()
         val headerRow = createCellInfoTableHeader()
         table.addView(headerRow)
-        for (cellInfo in allCellInfo) {
-            if (cellInfo == null) {
-                continue
+
+        if (isServiceRunning(MeasurementService::class.java)) {
+            val measurements = myService?.lastMeasurements
+
+            for (mp in measurements!!) {
+                if (mp.mcc != "0" && mp.mnc != "0") {
+                    val mccView = findViewById<TextView>(R.id.textViewMcc)
+                    val mncView = findViewById<TextView>(R.id.textViewMnc)
+                    val typeView = findViewById<TextView>(R.id.textViewType)
+
+                    val latView = findViewById<TextView>(R.id.textViewLatitude)
+                    val lonView = findViewById<TextView>(R.id.textViewLongitude)
+                    val accView = findViewById<TextView>(R.id.textViewAccuracy)
+
+                    mccView.text = mp.strOrNan(mp.mcc)
+                    mncView.text = mp.strOrNan(mp.mnc)
+                    typeView.text = mp.strOrNan(mp.type)
+                    if (mp.location != null) {
+                        latView.text = getString(R.string.meas_latitude_value, mp.location?.latitude)
+                        lonView.text = getString(R.string.meas_longitude_value, mp.location?.longitude)
+                        accView.text = getString(R.string.meas_accuracy_value, mp.location?.accuracy)
+                    }
+                }
+                val newRow = mp.toTableRow(this)
+                table.addView(newRow)
             }
-
-            val mp = MeasurementPoint(cellInfo)
-            val newRow = createCellInfoTableRow(mp)
-            table.addView(newRow)
         }
     }
-//
-//    fun toastMe(view: View) {
-//        val myToast = Toast.makeText(this, "Hello Toast!", Toast.LENGTH_SHORT)
-//        myToast.show()
-//    }
 
-    fun randomMe(view: View) {
-//        val count: Int = getCount()
-        val randomIntent = Intent(this, SecondActivity::class.java)
-        randomIntent.putExtra(SecondActivity.TOTAL_COUNT, 1)
-        startActivity(randomIntent)
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
-    fun start(view: View) {
-        val buttonView = findViewById<TextView>(R.id.button_start)
-        if (isStarted) {
-            buttonView.text = resources.getString(R.string.button_start)
-            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE)
+    private fun startOrBindMeasurementService() {
+        val serviceClass = MeasurementService::class.java
+        val serviceIntent = Intent(applicationContext, serviceClass)
+        if (!isServiceRunning(serviceClass)) {
+            startService(serviceIntent)
+            bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE)
         } else {
-            buttonView.text = resources.getString(R.string.button_stop)
-            tm.listen(phoneStateListener, PhoneStateListener.LISTEN_CELL_INFO or PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
+            Toast.makeText(this, "Service is already running.", Toast.LENGTH_LONG).show()
+            bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE)
         }
-        isStarted = !isStarted
     }
 
-    fun getMeasurement(view: View) {
-        getAllCellInfo()
+    fun updateRecordingButtons() {
+        if (!isServiceRunning(MeasurementService::class.java)) {
+            Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val recordButton: ImageButton = findViewById(R.id.ibtnRecord)
+        if (myService?.isRecording!!) {
+            recordButton.setImageResource(R.drawable.ic_baseline_pause_24px)
+        } else {
+            recordButton.setImageResource(R.drawable.ic_baseline_fiber_manual_record_24px)
+        }
+    }
+
+    fun toggleRecording(view: View) {
+        if (!isServiceRunning(MeasurementService::class.java)) {
+            Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
+            return
+        }
+        myService?.toggleRecording()
+        updateRecordingButtons()
+    }
+
+    fun stopRecording(view: View) {
+        if (!isServiceRunning(MeasurementService::class.java)) {
+            Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
+            return
+        }
+        myService?.isRecording = false
+        myService?.newRecording()
+        updateRecordingButtons()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_ALL -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    startOrBindMeasurementService()
+                }
+                return
+            }
+            else -> { }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Stetho.initializeWithDefaults(this)
 
-        tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        pullToRefresh.setOnRefreshListener {
+            getMeasurements()
+            pullToRefresh.isRefreshing = false
+        }
+
+        backgroundTask = Runnable{
+            getMeasurements()
+            mainHandler.postDelayed(
+                backgroundTask,
+                1000
+            )
+        }
+        if (getPermissions()) {
+            startOrBindMeasurementService()
+        }
+    }
+
+    override fun onPause() {
+        mainHandler.removeCallbacks(backgroundTask)
+        super.onPause()
+    }
+
+    override fun onResume() {
+        mainHandler.postDelayed(backgroundTask, 1000)
+        Handler().postDelayed({
+            updateRecordingButtons()
+        }, 2000)
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        val serviceClass = MeasurementService::class.java
+        val serviceIntent = Intent(applicationContext, serviceClass)
+        try {
+            unbindService(myConnection)
+        } catch (e: IllegalArgumentException) {
+            Log.w("MainActivity", "Error Unbinding Service.")
+        }
+        if (isServiceRunning(MeasurementService::class.java)) {
+            stopService(serviceIntent)
+        }
+        super.onDestroy()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        super.onOptionsItemSelected(item)
+        when {
+            item.itemId == R.id.start -> {
+                if (isStarted) {
+                    item.title= getString(R.string.button_start)
+                } else {
+                    item.title = getString(R.string.button_stop)
+                }
+                isStarted = !isStarted
+            }
+            item.itemId == R.id.pause -> {
+                if (isServiceRunning(MeasurementService::class.java)) {
+                    Toast.makeText(this, "Service is running.", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "Service is stopped.", Toast.LENGTH_LONG).show()
+                }
+            }
+            item.itemId == R.id.open -> {
+                val randomIntent = Intent(this, SecondActivity::class.java)
+                randomIntent.putExtra(SecondActivity.TOTAL_COUNT, 1)
+                startActivity(randomIntent)
+            }
+        }
+        return true
     }
 }
