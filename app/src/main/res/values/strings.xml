@@ -4,9 +4,11 @@
     <string name="button_update">Update</string>
     <string name="button_start">Start</string>
     <string name="button_record">Record</string>
-    <string name="button_list">Record</string>
+    <string name="button_list">List</string>
     <string name="button_pause">Pause</string>
     <string name="button_stop">Stop</string>
+    <string name="button_save">Save CSV</string>
+    <string name="button_status">Service status</string>
     <string name="title_empty">0</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>

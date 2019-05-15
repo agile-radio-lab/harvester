@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
-        <item android:id="@+id/start" android:title="Start"/>
-        <item android:id="@+id/pause" android:title="Pause"/>
+        <item android:id="@+id/save" android:title="@string/button_save"/>
+        <item android:id="@+id/status" android:title="@string/button_status"/>
         <item android:id="@+id/open" android:title="Open"/>
 </menu>

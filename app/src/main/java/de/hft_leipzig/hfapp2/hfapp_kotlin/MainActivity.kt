@@ -15,12 +15,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import com.facebook.stetho.Stetho
-import android.os.Build
 import android.view.View
 import android.widget.*
 
 
 const val PERMISSIONS_REQUEST_ALL = 0x1
+const val PERMISSIONS_REQUEST_WRITE_EXTERNAL = 0x2
 
 var ALL_PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     var myService: MeasurementService? = null
     var isBound = false
 
-    private var isStarted = false
     private val mainHandler = Handler()
     private lateinit var backgroundTask: Runnable
 
@@ -58,9 +57,9 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getPermissions(): Boolean {
-        if (!hasPermissions(this, ALL_PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, ALL_PERMISSIONS, PERMISSIONS_REQUEST_ALL)
+    private fun getPermissions(permissions: Array<String>, requestID: Int): Boolean {
+        if (!hasPermissions(this, permissions)) {
+            ActivityCompat.requestPermissions(this, permissions, requestID)
             return false
         }
         return true
@@ -102,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             val measurements = myService?.lastMeasurements
 
             for (mp in measurements!!) {
-                if (mp.mcc != "0" && mp.mnc != "0") {
+                if (mp.mcc != "0" && mp.mnc != "0" && mp.mnc != NAN.toString() && mp.mnc != NAN.toString()) {
                     val mccView = findViewById<TextView>(R.id.textViewMcc)
                     val mncView = findViewById<TextView>(R.id.textViewMnc)
                     val typeView = findViewById<TextView>(R.id.textViewType)
@@ -162,7 +161,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun toggleRecording(view: View) {
+    fun toggleRecording(@Suppress("UNUSED_PARAMETER") view: View) {
         if (!isServiceRunning(MeasurementService::class.java)) {
             Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
             return
@@ -171,7 +170,7 @@ class MainActivity : AppCompatActivity() {
         updateRecordingButtons()
     }
 
-    fun stopRecording(view: View) {
+    fun stopRecording(@Suppress("UNUSED_PARAMETER") view: View) {
         if (!isServiceRunning(MeasurementService::class.java)) {
             Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
             return
@@ -181,12 +180,21 @@ class MainActivity : AppCompatActivity() {
         updateRecordingButtons()
     }
 
+    fun openMeasurementList(@Suppress("UNUSED_PARAMETER") view: View) {
+        val randomIntent = Intent(this, SecondActivity::class.java)
+        startActivity(randomIntent)
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             PERMISSIONS_REQUEST_ALL -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     startOrBindMeasurementService()
                 }
+                return
+            }
+            PERMISSIONS_REQUEST_WRITE_EXTERNAL -> {
+                Toast.makeText(this, "Try saving file again", Toast.LENGTH_LONG).show()
                 return
             }
             else -> { }
@@ -211,7 +219,7 @@ class MainActivity : AppCompatActivity() {
                 1000
             )
         }
-        if (getPermissions()) {
+        if (getPermissions(ALL_PERMISSIONS, PERMISSIONS_REQUEST_ALL)) {
             startOrBindMeasurementService()
         }
     }
@@ -251,15 +259,18 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         when {
-            item.itemId == R.id.start -> {
-                if (isStarted) {
-                    item.title= getString(R.string.button_start)
-                } else {
-                    item.title = getString(R.string.button_stop)
+            item.itemId == R.id.save -> {
+                if (isServiceRunning(MeasurementService::class.java)) {
+                    if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+                        getPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                            PERMISSIONS_REQUEST_WRITE_EXTERNAL)
+                        return false
+                    }
+                    myService?.saveMeasurement()
                 }
-                isStarted = !isStarted
+
             }
-            item.itemId == R.id.pause -> {
+            item.itemId == R.id.status -> {
                 if (isServiceRunning(MeasurementService::class.java)) {
                     Toast.makeText(this, "Service is running.", Toast.LENGTH_LONG).show()
                 } else {
@@ -268,7 +279,6 @@ class MainActivity : AppCompatActivity() {
             }
             item.itemId == R.id.open -> {
                 val randomIntent = Intent(this, SecondActivity::class.java)
-                randomIntent.putExtra(SecondActivity.TOTAL_COUNT, 1)
                 startActivity(randomIntent)
             }
         }

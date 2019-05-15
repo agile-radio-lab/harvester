@@ -17,8 +17,12 @@ import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.location.*
+import java.io.File
+import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
+
+const val CSV_HEADER = "timestamp,sessionID,datetime,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
 
 @Database(entities = [MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -47,11 +51,46 @@ class MeasurementService : Service() {
     private var mLastLocation: Location? = null
     var lastMeasurements: ArrayList<MeasurementPoint> = ArrayList()
 
+    internal inner class GetSessionsFromDB : Runnable {
+        override fun run() {
+            db.measurementPointDao().getAllSessions()
+        }
+    }
+
     internal inner class AddMeasurementToDB(var mp: MeasurementPoint) : Runnable {
         override fun run() {
             db.measurementPointDao().insertAll(mp)
         }
     }
+
+    internal inner class GetMeasurementsFromDB : Runnable {
+        override fun run() {
+            val exportDir =  File(Environment.getExternalStorageDirectory(), "")
+            Log.i("Measurement service", exportDir.absolutePath)
+
+            if (!exportDir.exists()) {
+                exportDir.mkdirs()
+            }
+
+            val file = File(exportDir, "csvname.csv")
+            if (!file.exists()) {
+                file.createNewFile()
+            }
+
+            val fileWriter = FileWriter(file.absoluteFile)
+            fileWriter.append(CSV_HEADER)
+            fileWriter.append('\n')
+            val res = db.measurementPointDao().getAll()
+            for (r in res) {
+                Log.i("Measurement service", r.sessionID)
+                fileWriter.append(r.toCSVRow())
+                fileWriter.append('\n')
+            }
+            fileWriter.flush()
+            fileWriter.close()
+        }
+    }
+
 
     override fun onBind(intent: Intent): IBinder? {
         return myBinder
@@ -61,6 +100,16 @@ class MeasurementService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             mLastLocation = locationResult.lastLocation
         }
+    }
+
+    fun getSessions() {
+        val t = Thread(GetSessionsFromDB())
+        t.start()
+        t.join()
+    }
+
+    fun saveMeasurement() {
+        Thread(GetMeasurementsFromDB()).start()
     }
 
     fun newRecording() {
@@ -89,6 +138,11 @@ class MeasurementService : Service() {
         if (allCellInfo.size == 0) {
             return lastMeasurements
         }
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        val datetime = sdf.format(Date())
+
         for (cellInfo in allCellInfo) {
             if (cellInfo == null) {
                 continue
@@ -96,6 +150,7 @@ class MeasurementService : Service() {
             val mp = MeasurementPoint(cellInfo)
             mp.sessionID = sessionID
             mp.newLocation(mLastLocation)
+            mp.datetime = datetime
             if (isRecording) {
                 Thread(AddMeasurementToDB(mp)).start()
             }

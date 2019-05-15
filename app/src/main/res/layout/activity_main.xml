@@ -109,7 +109,8 @@
         <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/ic_baseline_list_24px"
-                android:id="@+id/ibtnList" android:layout_weight="1" android:contentDescription="@string/button_list"/>
+                android:id="@+id/ibtnList" android:layout_weight="1" android:contentDescription="@string/button_list"
+                android:onClick="openMeasurementList"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
