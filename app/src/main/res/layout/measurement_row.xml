@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:app="http://schemas.android.com/apk/res-auto"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          android:layout_marginStart="8dp"
+          android:layout_marginEnd="8dp"
+          app:layout_constraintTop_toTopOf="parent">
+    <TextView
+            android:text="@string/meas_type_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvType" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+    <TextView
+            android:text="@string/meas_pci_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvPci" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+    <TextView
+            android:text="@string/meas_freq_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvBand" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+    <TextView
+            android:text="@string/meas_rsrp_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvRsrp" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+    <TextView
+            android:text="@string/meas_rsrq_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvRsrq" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+    <TextView
+            android:text="@string/meas_asu_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/tvAsu" android:layout_weight="1"
+            app:autoSizeTextType="uniform"/>
+</TableRow>

@@ -7,17 +7,21 @@
     <string name="button_pause">Pause</string>
     <string name="button_stop">Stop</string>
     <string name="button_save">Save CSV</string>
+    <string name="button_upload">Upload</string>
     <string name="button_status">Service status</string>
     <string name="title_empty">0</string>
+    <string name="title_neighbours">All Cells</string>
+    <string name="title_serving">Serving Cell</string>
+    <string name="title_location">Location</string>
 
     <string name="na_placeholder">N/A</string>
 
     <string name="meas_latitude_label">Lat</string>
     <string name="meas_longitude_label">Lon</string>
 
-    <string name="meas_latitude_value">Lat: %1$.4f</string>
-    <string name="meas_longitude_value">Lon: %1$.4f</string>
-    <string name="meas_accuracy_value">Acc: %1$.2f</string>
+    <string name="meas_latitude_value">%1$.4f</string>
+    <string name="meas_longitude_value">%1$.4f</string>
+    <string name="meas_accuracy_value">%1$.2f</string>
 
     <string name="meas_type_label">Type</string>
     <string name="meas_type_lte">LTE</string>
@@ -28,7 +32,7 @@
     <string name="meas_rsrp_label">RSRP</string>
     <string name="meas_rsrq_label">RSRQ</string>
     <string name="meas_rssnr_label">RSSNR</string>
-    <string name="meas_rssnr_label_long">Refernce Signal Signal to Noise Ratio</string>
+    <string name="meas_rssnr_label_long">Reference Signal Signal to Noise Ratio</string>
     <string name="meas_cqi_label">CQI</string>
     <string name="meas_cqi_label_long">Channgel Quality Indicator</string>
     <string name="meas_ta_label">TA</string>
@@ -40,8 +44,17 @@
     <string name="meas_mnc_label">MNC</string>
     <string name="meas_pci_label">PCI</string>
     <string name="meas_time_label">Time</string>
+    <string name="meas_accuracy_label">Accuracy</string>
+    <string name="meas_speed_label">Speed</string>
+    <string name="meas_network_label">Network</string>
+    <string name="meas_asu_label">ASU</string>
+
     <string name="permission_needed">Application needs location permissions</string>
 
+    <string name="meas_network_value">%s %s</string>
+
+
     <string name="mapbox_access_token">pk.eyJ1IjoiaWdvcnNraCIsImEiOiJjanI4OHo4dGowM2NsNDVxcWtnMnAxcXJsIn0.hSNkb9tcYb7J-VBy7LD5HA</string>
+    <string name="empty_time">00:00:00</string>
 
 </resources>

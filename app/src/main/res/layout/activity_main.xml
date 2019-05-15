@@ -17,12 +17,21 @@
             android:layout_marginEnd="8dp" android:layout_marginStart="8dp" android:id="@+id/tableLayout"
             android:layout_marginTop="5dp">
 
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/title_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:id="@+id/tvLocation_title" android:textSize="18sp"
+                    android:textStyle="bold"/>
+        </TableRow>
         <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
             <TextView
                     android:text="@string/meas_latitude_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewLatitude"
+                    android:id="@+id/tvLatitude_label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
@@ -30,43 +39,151 @@
                     android:text="@string/meas_longitude_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewLongitude"
+                    android:id="@+id/tvLongitude_label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
             <TextView
-                    android:text="@string/meas_longitude_label"
+                    android:text="@string/meas_accuracy_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewAccuracy"
+                    android:id="@+id/tvAccuracy_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_speed_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvSpeed_label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
         </TableRow>
         <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
             <TextView
-                    android:text="@string/meas_type_label"
+                    android:text="@string/na_placeholder"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewType"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:id="@+id/tvLatitude"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
             <TextView
-                    android:text="@string/meas_mcc_label"
+                    android:text="@string/na_placeholder"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewMcc"
+                    android:id="@+id/tvLongitude"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAccuracy"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvSpeed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/title_serving"
+                    android:layout_width="wrap_content"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_height="wrap_content" android:id="@+id/tvServing_title" android:textSize="18sp"
+                    android:textStyle="bold"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/meas_network_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvNetwork_label"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_weight="1"/>
             <TextView
-                    android:text="@string/meas_mnc_label"
+                    android:text="@string/meas_rssnr_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/textViewMnc"
-                    app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toStartOf="@+id/textViewType"
-                    app:layout_constraintStart_toStartOf="parent" android:layout_weight="1"/>
+                    android:id="@+id/tvRssnr_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_ta_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvTa_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_cqi_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvCqi_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvNetwork"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvRssnr"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvTa"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvCqi"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/tvTime"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
         </TableRow>
     </TableLayout>
     <android.support.v4.widget.SwipeRefreshLayout
@@ -76,15 +193,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginStart="5dp" android:layout_marginEnd="5dp" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/tableLayout"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/buttonsLayout">
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/buttonsLayout"
+            android:layout_marginTop="5dp" app:layout_constraintTop_toBottomOf="@+id/tvNeighbors_title"
+            android:textSize="36sp">
         <TableLayout
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:id="@+id/tableResults"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginStart="0dp"
                 android:layout_marginTop="8dp">
         </TableLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
@@ -96,6 +213,14 @@
             android:id="@+id/buttonsLayout"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp">
+
+        <TextView
+                android:text="@string/empty_time"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" android:id="@+id/tvElapsed"
+                android:textSize="24sp"
+                android:gravity="center"
+                android:layout_weight="1"/>
         <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" app:srcCompat="@drawable/ic_baseline_stop_24px"
@@ -112,5 +237,14 @@
                 android:id="@+id/ibtnList" android:layout_weight="1" android:contentDescription="@string/button_list"
                 android:onClick="openMeasurementList"/>
     </LinearLayout>
+    <TextView
+            android:text="@string/title_neighbours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvNeighbors_title"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:textSize="18sp" android:textStyle="bold"
+            android:layout_marginTop="10dp"/>
 
 </android.support.constraint.ConstraintLayout>

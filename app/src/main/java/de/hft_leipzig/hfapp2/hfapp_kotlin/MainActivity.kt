@@ -12,12 +12,13 @@ import android.support.v7.app.AppCompatActivity
 import java.util.*
 import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import com.facebook.stetho.Stetho
 import android.view.View
 import android.widget.*
-
+import kotlinx.android.synthetic.main.measurement_row.*
 
 const val PERMISSIONS_REQUEST_ALL = 0x1
 const val PERMISSIONS_REQUEST_WRITE_EXTERNAL = 0x2
@@ -94,33 +95,57 @@ class MainActivity : AppCompatActivity() {
         }
         val table: TableLayout = findViewById(R.id.tableResults)
         table.removeAllViews()
-        val headerRow = createCellInfoTableHeader()
+        val factory: LayoutInflater = layoutInflater
+        val headerRow = factory.inflate(R.layout.measurement_row, table, false)
         table.addView(headerRow)
 
         if (isServiceRunning(MeasurementService::class.java)) {
-            val measurements = myService?.lastMeasurements
+            val tvElapsed: TextView = findViewById(R.id.tvElapsed)
+            if (myService?.isRecording!!) {
+                tvElapsed.text = myService?.elapsed()
+            }
 
+            val measurements = myService?.lastMeasurements
             for (mp in measurements!!) {
                 if (mp.mcc != "0" && mp.mnc != "0" && mp.mnc != NAN.toString() && mp.mnc != NAN.toString()) {
-                    val mccView = findViewById<TextView>(R.id.textViewMcc)
-                    val mncView = findViewById<TextView>(R.id.textViewMnc)
-                    val typeView = findViewById<TextView>(R.id.textViewType)
+                    val tvNetwork = findViewById<TextView>(R.id.tvNetwork)
+                    val tvLatitude = findViewById<TextView>(R.id.tvLatitude)
+                    val tvLongitude = findViewById<TextView>(R.id.tvLongitude)
+                    val tvAccuracy = findViewById<TextView>(R.id.tvAccuracy)
+                    val tvSpeed = findViewById<TextView>(R.id.tvSpeed)
+                    val tvTime = findViewById<TextView>(R.id.tvTime)
 
-                    val latView = findViewById<TextView>(R.id.textViewLatitude)
-                    val lonView = findViewById<TextView>(R.id.textViewLongitude)
-                    val accView = findViewById<TextView>(R.id.textViewAccuracy)
-
-                    mccView.text = mp.strOrNan(mp.mcc)
-                    mncView.text = mp.strOrNan(mp.mnc)
-                    typeView.text = mp.strOrNan(mp.type)
+                    tvTime.text = mp.datetime
+                    tvNetwork.text = getString(R.string.meas_network_value, mp.strOrNan(mp.mcc), mp.strOrNan(mp.mnc))
                     if (mp.location != null) {
-                        latView.text = getString(R.string.meas_latitude_value, mp.location?.latitude)
-                        lonView.text = getString(R.string.meas_longitude_value, mp.location?.longitude)
-                        accView.text = getString(R.string.meas_accuracy_value, mp.location?.accuracy)
+                        tvLatitude.text = getString(R.string.meas_latitude_value, mp.location?.latitude)
+                        tvLongitude.text = getString(R.string.meas_longitude_value, mp.location?.longitude)
+                        tvAccuracy.text = getString(R.string.meas_accuracy_value, mp.location?.accuracy)
+                        tvSpeed.text = getString(R.string.meas_accuracy_value, mp.location?.speed)
                     }
+
+                    val tvCqi = findViewById<TextView>(R.id.tvCqi)
+                    val tvRssnr = findViewById<TextView>(R.id.tvRssnr)
+                    val tvTa = findViewById<TextView>(R.id.tvTa)
+                    tvCqi.text = mp.strOrNan(mp.cqi)
+                    tvRssnr.text = mp.strOrNan(mp.rssnr)
+                    tvTa.text = mp.strOrNan(mp.ta)
                 }
-                val newRow = mp.toTableRow(this)
-                table.addView(newRow)
+                val factory: LayoutInflater = layoutInflater
+                val rowView = factory.inflate(R.layout.measurement_row, table, false)
+                val tvType = rowView.findViewById(R.id.tvType) as TextView
+                val tvBand = rowView.findViewById(R.id.tvBand) as TextView
+                val tvPci = rowView.findViewById(R.id.tvPci) as TextView
+                val tvRsrp = rowView.findViewById(R.id.tvRsrp) as TextView
+                val tvRsrq = rowView.findViewById(R.id.tvRsrq) as TextView
+                val tvAsu = rowView.findViewById(R.id.tvAsu) as TextView
+                tvType.text = mp.strOrNan(mp.type)
+                tvBand.text = mp.strOrNan(mp.band)
+                tvPci.text = mp.strOrNan(mp.pci)
+                tvRsrp.text = mp.strOrNan(mp.rsrp)
+                tvRsrq.text = mp.strOrNan(mp.rsrq)
+                tvAsu.text = mp.strOrNan(mp.asu)
+                table.addView(rowView)
             }
         }
     }
@@ -147,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun updateRecordingButtons() {
+    private fun updateRecordingButtons() {
         if (!isServiceRunning(MeasurementService::class.java)) {
             Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
             return
@@ -175,8 +200,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Service is not running.", Toast.LENGTH_LONG).show()
             return
         }
-        myService?.isRecording = false
-        myService?.newRecording()
+        myService?.stopMeasurement()
         updateRecordingButtons()
     }
 

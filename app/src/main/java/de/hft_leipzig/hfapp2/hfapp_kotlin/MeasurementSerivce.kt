@@ -20,6 +20,8 @@ import com.google.android.gms.location.*
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 const val CSV_HEADER = "timestamp,sessionID,datetime,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
@@ -33,6 +35,8 @@ class MeasurementService : Service() {
     private val interval: Long = 1000
     private val fastestInterval: Long = 500
     private lateinit var db: AppDatabase
+
+    private lateinit var startedMeasurementAt: Date
 
     private val myBinder = MyLocalBinder()
     private lateinit var mNotification: Notification
@@ -50,12 +54,6 @@ class MeasurementService : Service() {
     private lateinit var mLocationRequest: LocationRequest
     private var mLastLocation: Location? = null
     var lastMeasurements: ArrayList<MeasurementPoint> = ArrayList()
-
-    internal inner class GetSessionsFromDB : Runnable {
-        override fun run() {
-            db.measurementPointDao().getAllSessions()
-        }
-    }
 
     internal inner class AddMeasurementToDB(var mp: MeasurementPoint) : Runnable {
         override fun run() {
@@ -102,17 +100,17 @@ class MeasurementService : Service() {
         }
     }
 
-    fun getSessions() {
-        val t = Thread(GetSessionsFromDB())
-        t.start()
-        t.join()
-    }
-
     fun saveMeasurement() {
         Thread(GetMeasurementsFromDB()).start()
     }
 
+    fun stopMeasurement() {
+        sessionID = ""
+        isRecording = false
+    }
+
     fun newRecording() {
+        startedMeasurementAt = Date()
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         sdf.timeZone = TimeZone.getTimeZone("UTC")
         val infoDate = Date()
@@ -124,6 +122,16 @@ class MeasurementService : Service() {
             newRecording()
         }
         isRecording = !isRecording
+    }
+
+    fun elapsed(): String {
+        val diff = Date().time - startedMeasurementAt.time
+        val seconds = diff / 1000
+        val seconds_show = (seconds%60).toString().padStart(2, '0')
+        val minutes = seconds / 60
+        val minutes_show = (minutes%60).toString().padStart(2, '0')
+        val hours = (minutes / 60).toString().padStart(2, '0')
+        return "$hours:$minutes_show:$seconds_show"
     }
 
     fun getMeasurements(): ArrayList<MeasurementPoint> {
@@ -196,6 +204,7 @@ class MeasurementService : Service() {
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        startedMeasurementAt = Date()
 
         backgroundTask = Runnable {
             getMeasurements()
