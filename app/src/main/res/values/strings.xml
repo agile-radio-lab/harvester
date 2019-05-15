@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HfTL Signal Collector</string>
+    <string name="app_name">HfTL Signal Harvester</string>
     <string name="title_home">Home</string>
     <string name="button_start">Start</string>
     <string name="button_record">Record</string>
