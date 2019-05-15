@@ -1,7 +1,6 @@
 <resources>
-    <string name="app_name">hfapp_kotlin</string>
+    <string name="app_name">HfTL Signal Collector</string>
     <string name="title_home">Home</string>
-    <string name="button_update">Update</string>
     <string name="button_start">Start</string>
     <string name="button_record">Record</string>
     <string name="button_list">List</string>
@@ -11,9 +10,6 @@
     <string name="button_status">Service status</string>
     <string name="title_empty">0</string>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="random_heading">Here is a random number between 0 and %1d.</string>
-    <string name="random_label">R</string>
     <string name="na_placeholder">N/A</string>
 
     <string name="meas_latitude_label">Lat</string>

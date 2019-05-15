@@ -277,10 +277,6 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Service is stopped.", Toast.LENGTH_LONG).show()
                 }
             }
-            item.itemId == R.id.open -> {
-                val randomIntent = Intent(this, SecondActivity::class.java)
-                startActivity(randomIntent)
-            }
         }
         return true
     }

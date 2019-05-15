@@ -4,5 +4,4 @@
       android:layout_height="match_parent">
         <item android:id="@+id/save" android:title="@string/button_save"/>
         <item android:id="@+id/status" android:title="@string/button_status"/>
-        <item android:id="@+id/open" android:title="Open"/>
 </menu>
