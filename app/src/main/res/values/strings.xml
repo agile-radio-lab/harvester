@@ -46,5 +46,6 @@
     <string name="meas_time_label">Time</string>
     <string name="permission_needed">Application needs location permissions</string>
 
+    <string name="mapbox_access_token">pk.eyJ1IjoiaWdvcnNraCIsImEiOiJjanI4OHo4dGowM2NsNDVxcWtnMnAxcXJsIn0.hSNkb9tcYb7J-VBy7LD5HA</string>
 
 </resources>

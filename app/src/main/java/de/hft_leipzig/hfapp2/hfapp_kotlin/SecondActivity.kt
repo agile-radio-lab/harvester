@@ -66,7 +66,6 @@ class SecondActivity : AppCompatActivity() {
             applicationContext,
             AppDatabase::class.java, "measurements"
         ).build()
-
         getSessions()
 
         listView = findViewById(R.id.lvSessions)
@@ -76,9 +75,20 @@ class SecondActivity : AppCompatActivity() {
             val recipe = sessionList[i]
             listItems[i] = recipe.sessionID
         }
-
         val adapter = SessionAdapter(this, sessionList)
         listView.adapter = adapter
+
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val selectedSession = sessionList[position]
+            val detailIntent = MapPopupActivity.newIntent(this, selectedSession)
+            startActivity(detailIntent)
+
+        }
     }
 
+//
+//    override fun onStop() {
+//        super.onStop()
+//        db.close()
+//    }
 }

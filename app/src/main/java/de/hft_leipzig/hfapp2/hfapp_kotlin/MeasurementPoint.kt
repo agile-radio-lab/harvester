@@ -15,6 +15,8 @@ import java.util.*
 const val NAN =  2147483647
 const val NAN_F =  2147483647f
 
+data class MeasurementMapPoint(var locLatidute: Double, var locLongitude: Double)
+
 @Dao
 interface MeasurementPointDao {
     @Query("SELECT * FROM measurementPoint")
@@ -25,6 +27,9 @@ interface MeasurementPointDao {
 
     @Query("SELECT * FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
     fun getPrimaryBySessionID(sessionID: String): List<MeasurementPoint>
+
+    @Query("SELECT locLatidute, locLongitude FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
+    fun getMapPointsBySessionID(sessionID: String): List<MeasurementMapPoint>
 
     @Query("SELECT DISTINCT uid, sessionID FROM measurementPoint")
     fun getAllSessions(): List<Session>
