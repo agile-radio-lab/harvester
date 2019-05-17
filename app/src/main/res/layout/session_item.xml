@@ -1,13 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
                                              android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/sessionID"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+    >
+        <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/cbSelect" android:layout_weight="0.25"
+        />
+        <TextView
+                android:id="@+id/lvSessionID"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:gravity="center" android:text="@string/na_placeholder" android:layout_weight="1"/>
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" app:srcCompat="@drawable/ic_baseline_cloud_24px"
+                android:id="@+id/ivUploaded" android:layout_weight="0.25"
+                android:contentDescription="@string/icon_uploaded" android:visibility="invisible"/>
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" app:srcCompat="@drawable/ic_baseline_file_copy_24px"
+                android:id="@+id/ivSaved" android:layout_weight="0.25" android:contentDescription="@string/icon_saved"
+                android:visibility="invisible"/>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
