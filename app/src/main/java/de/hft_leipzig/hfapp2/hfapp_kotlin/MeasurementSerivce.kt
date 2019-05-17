@@ -20,11 +20,9 @@ import com.google.android.gms.location.*
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.temporal.ChronoUnit
 import java.util.*
 
-const val CSV_HEADER = "timestamp,sessionID,datetime,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
+const val CSV_HEADER = "timestamp,sessionID,datetime,type,imei,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
 
 @Database(entities = [MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -159,6 +157,15 @@ class MeasurementService : Service() {
             mp.sessionID = sessionID
             mp.newLocation(mLastLocation)
             mp.datetime = datetime
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mp.imei = tm.imei
+                } else {
+                    mp.imei = tm.deviceId
+                }
+            }
             if (isRecording) {
                 Thread(AddMeasurementToDB(mp)).start()
             }
@@ -199,7 +206,6 @@ class MeasurementService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        Toast.makeText(this, "Service is created", Toast.LENGTH_LONG).show()
         getNotification(applicationContext)
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
