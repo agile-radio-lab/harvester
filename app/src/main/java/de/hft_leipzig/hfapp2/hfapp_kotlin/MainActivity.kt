@@ -18,19 +18,24 @@ import android.view.MenuItem
 import com.facebook.stetho.Stetho
 import android.view.View
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.measurement_row.*
+import org.tensorflow.contrib.android.TensorFlowInferenceInterface
+import kotlin.collections.ArrayList
 
 const val PERMISSIONS_REQUEST_ALL = 0x1
 const val PERMISSIONS_REQUEST_WRITE_EXTERNAL = 0x2
 
 var ALL_PERMISSIONS = arrayOf(
     android.Manifest.permission.ACCESS_COARSE_LOCATION,
-    android.Manifest.permission.ACCESS_FINE_LOCATION
+    android.Manifest.permission.ACCESS_FINE_LOCATION,
+    android.Manifest.permission.READ_PHONE_STATE
 )
 
 class MainActivity : AppCompatActivity() {
     var myService: MeasurementService? = null
     var isBound = false
+    lateinit var tfInterface: TensorFlowInferenceInterface
 
     private val mainHandler = Handler()
     private lateinit var backgroundTask: Runnable
@@ -66,27 +71,34 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun createCellInfoTableHeader(rightPadding: Int = 20, fontSize: Float = 10.0f): TableRow {
-        val row = TableRow(this)
-        val layoutParams = TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT)
-        row.layoutParams = layoutParams
-
-        val columns: ArrayList<TextView> = ArrayList()
-        columns.add(createTextViewCell(this, getString(R.string.meas_time_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_status_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_freq_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_pci_label), rightPadding, fontSize))
-
-        columns.add(createTextViewCell(this, getString(R.string.meas_rsrp_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_rsrq_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_rssnr_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_ta_label), rightPadding, fontSize))
-        columns.add(createTextViewCell(this, getString(R.string.meas_cqi_label), rightPadding, fontSize))
-
-        for (c in columns) {
-            row.addView(c)
+    private fun predict(mp: MeasurementPoint): Int {
+        tfInterface.feed("dense_9_input", floatArrayOf(mp.rsrp.toFloat(),mp.rsrq.toFloat()), 1, 2)
+        tfInterface.run(arrayOf("dense_10/Softmax"))
+        val output = floatArrayOf(-1f, -1f, -1f, -1f, -1f)
+        tfInterface.fetch("dense_10/Softmax", output)
+        var maxIdx = -1
+        var maxVal = -1f
+        var curIdx = 0
+        for (i in output) {
+            if (i > maxVal) {
+                maxVal = i
+                maxIdx = curIdx
+            }
+            curIdx += 1
         }
-        return row
+        return maxIdx
+    }
+
+    private fun getSnrIndex(sinrVal: Int): Int {
+        val range: ArrayList<Int> = arrayListOf(-13,  -1,  11,  23,  35)
+        var idx = 0
+        for (r in range) {
+            if (sinrVal <= r) {
+                return idx
+            }
+            idx += 1
+        }
+        return idx
     }
 
     private fun getMeasurements() {
@@ -130,6 +142,16 @@ class MainActivity : AppCompatActivity() {
                     tvCqi.text = mp.strOrNan(mp.cqi)
                     tvRssnr.text = mp.strOrNan(mp.rssnr)
                     tvTa.text = mp.strOrNan(mp.ta)
+
+                    val idxActual = getSnrIndex(mp.rssnr)
+                    val idxPredicted = predict(mp)
+
+                    if (mp.rssnr < NAN) {
+                        val tvActualClass = findViewById<TextView>(R.id.tvActualClass)
+                        val tvPredictedClass = findViewById<TextView>(R.id.tvPredictedClass)
+                        tvActualClass.text = idxActual.toString()
+                        tvPredictedClass.text = idxPredicted.toString()
+                    }
                 }
                 val factory: LayoutInflater = layoutInflater
                 val rowView = factory.inflate(R.layout.measurement_row, table, false)
@@ -167,7 +189,6 @@ class MainActivity : AppCompatActivity() {
             startService(serviceIntent)
             bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE)
         } else {
-            Toast.makeText(this, "Service is already running.", Toast.LENGTH_LONG).show()
             bindService(serviceIntent, myConnection, Context.BIND_AUTO_CREATE)
         }
     }
@@ -230,6 +251,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         Stetho.initializeWithDefaults(this)
 
+        tfInterface = TensorFlowInferenceInterface(assets, "my_model.pb")
+
         val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         pullToRefresh.setOnRefreshListener {
             getMeasurements()
@@ -291,14 +314,6 @@ class MainActivity : AppCompatActivity() {
                         return false
                     }
                     myService?.saveMeasurement()
-                }
-
-            }
-            item.itemId == R.id.status -> {
-                if (isServiceRunning(MeasurementService::class.java)) {
-                    Toast.makeText(this, "Service is running.", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "Service is stopped.", Toast.LENGTH_LONG).show()
                 }
             }
         }
