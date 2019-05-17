@@ -6,6 +6,7 @@
     <string name="button_list">List</string>
     <string name="button_pause">Pause</string>
     <string name="button_stop">Stop</string>
+    <string name="button_about">About</string>
     <string name="button_save">Save CSV</string>
     <string name="button_delete">Delete</string>
     <string name="button_upload">Upload</string>
@@ -63,7 +64,15 @@
 
     <string name="meas_network_value">%s %s</string>
 
-    <string name="mapbox_access_token">pk.eyJ1IjoiaWdvcnNraCIsImEiOiJjanI4OHo4dGowM2NsNDVxcWtnMnAxcXJsIn0.hSNkb9tcYb7J-VBy7LD5HA</string>
+
+    <string name="about_title">HfTL Signal Harvester</string>
+    <string name="about_support">Developer and maintainer:  Igor Kim</string>
+    <string name="about_issues">Report issues to: </string>
+    <string name="about_copyright">2019 © Hochschule für Telekommunikation Leipzig</string>
+
+    <string name="mapbox_access_token">
+        pk.eyJ1IjoiaWdvcnNraCIsImEiOiJjanI4OHo4dGowM2NsNDVxcWtnMnAxcXJsIn0.hSNkb9tcYb7J-VBy7LD5HA
+    </string>
     <string name="empty_time">00:00:00</string>
 
     <string name="upload_url">https://measurements.otc.roundeasy.ru/</string>

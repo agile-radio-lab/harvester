@@ -316,6 +316,10 @@ class MainActivity : AppCompatActivity() {
                     myService?.saveMeasurement()
                 }
             }
+            item.itemId == R.id.about -> {
+                val intent = Intent(applicationContext, AboutActivity::class.java)
+                startActivity(intent)
+            }
         }
         return true
     }

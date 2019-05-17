@@ -3,4 +3,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent">
         <item android:id="@+id/save" android:title="@string/button_save"/>
+        <item android:id="@+id/about" android:title="@string/button_about"/>
+
+
 </menu>
