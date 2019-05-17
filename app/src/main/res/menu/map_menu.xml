@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+    <item android:id="@+id/save"
+          android:icon="@drawable/ic_baseline_save_24px"
+          app:showAsAction="ifRoom"
+          android:title="@string/button_save"
+          android:tint="#FFFFFF"/>
+    <item android:id="@+id/upload"
+          android:icon="@drawable/ic_baseline_cloud_upload_24px"
+          app:showAsAction="ifRoom"
+          android:title="@string/button_upload"
+          android:tint="#FFFFFF"/>
+    <item android:id="@+id/delete"
+          android:icon="@drawable/ic_baseline_delete_forever_24px"
+          app:showAsAction="ifRoom"
+          android:title="@string/button_delete"
+          android:tint="#FFFFFF"/>
+</menu>
