@@ -11,11 +11,12 @@ import android.widget.TableRow
 import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val NAN =  2147483647
 const val NAN_F =  2147483647f
 
-data class MeasurementMapPoint(var locLatidute: Double, var locLongitude: Double)
+data class MeasurementMapPoint(var locLatitude: Double, var locLongitude: Double)
 
 @Dao
 interface MeasurementPointDao {
@@ -25,17 +26,38 @@ interface MeasurementPointDao {
     @Query("SELECT * FROM measurementPoint WHERE sessionID=:sessionID")
     fun getAllBySessionID(sessionID: String): List<MeasurementPoint>
 
+    @Query("SELECT * FROM measurementPoint WHERE sessionID IN(:sessionIDs)")
+    fun getAllBySessionID(sessionIDs: Array<String>): List<MeasurementPoint>
+
     @Query("SELECT * FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
     fun getPrimaryBySessionID(sessionID: String): List<MeasurementPoint>
 
-    @Query("SELECT locLatidute, locLongitude FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
+    @Query("SELECT locLatitude, locLongitude FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
     fun getMapPointsBySessionID(sessionID: String): List<MeasurementMapPoint>
 
-    @Query("SELECT DISTINCT uid, sessionID FROM measurementPoint")
+    @Query("SELECT DISTINCT uid, sessionID, exportedStatus FROM measurementPoint")
     fun getAllSessions(): List<Session>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg measurementPoints: MeasurementPoint)
+
+    @Query("DELETE FROM measurementPoint WHERE sessionID=:sessionID")
+    fun deleteBySessionID(sessionID: String)
+
+    @Query("DELETE FROM measurementPoint WHERE sessionID IN(:sessionIDs)")
+    fun deleteBySessionID(sessionIDs: Array<String>)
+
+    @Query("UPDATE measurementPoint SET exportedStatus=exportedStatus|:exportedStatus WHERE sessionID IN(:sessionIDs)")
+    fun orExportStatusBySessionID(exportedStatus: Int, sessionIDs: Array<String>)
+
+    @Query("UPDATE measurementPoint SET exportedStatus=exportedStatus|:exportedStatus WHERE sessionID=:sessionID")
+    fun orExportStatusBySessionID(exportedStatus: Int, sessionID: String)
+
+    @Query("UPDATE measurementPoint SET exportedStatus=:exportedStatus WHERE sessionID=:sessionID")
+    fun setExportStatusBySessionID(exportedStatus: Int, sessionID: String)
+
+    @Query("UPDATE measurementPoint SET exportedStatus=:exportedStatus WHERE sessionID IN(:sessionIDs)")
+    fun setExportStatusBySessionID(exportedStatus: Int, sessionIDs: Array<String>)
 }
 
 @Entity(primaryKeys = ["timestamp", "sessionID", "ci", "pci"])
@@ -43,7 +65,9 @@ data class MeasurementPoint(val uid: Int) {
     var timestamp: Long = 0
     var sessionID: String = ""
     var datetime: String = ""
+    var exportedStatus: Int = 0
     var type: String = ""
+    var imei: String = ""
     var status: String = NAN.toString()
     var band: Int = NAN
     var mcc: String = NAN.toString()
@@ -56,9 +80,9 @@ data class MeasurementPoint(val uid: Int) {
     var ta: Int = NAN
     var cqi: Int = NAN
     var ci: Int = NAN
-    var locLatidute: Double = NAN_F.toDouble()
+    var locLatitude: Double = NAN_F.toDouble()
     var locLongitude: Double = NAN_F.toDouble()
-    var locAltidute: Double = NAN_F.toDouble()
+    var locAltitude: Double = NAN_F.toDouble()
     var locAccuracy: Float = NAN_F
     var locSpeed: Float = NAN_F
     var locSpeedAcc: Float = NAN_F
@@ -68,6 +92,8 @@ data class MeasurementPoint(val uid: Int) {
         var res = timestamp.toString() + sep
         res += sessionID + sep
         res += datetime + sep
+        res += type + sep
+        res += imei + sep
         res += status + sep
         res += band.toString() + sep
         res += mcc + sep
@@ -80,9 +106,9 @@ data class MeasurementPoint(val uid: Int) {
         res += ta.toString() + sep
         res += cqi.toString() + sep
         res += ci.toString() + sep
-        res += locLatidute.toString() + sep
+        res += locLatitude.toString() + sep
         res += locLongitude.toString() + sep
-        res += locAltidute.toString() + sep
+        res += locAltitude.toString() + sep
         res += locAccuracy.toString() + sep
         res += locSpeed.toString() + sep
         res += locSpeedAcc.toString() + sep
@@ -94,9 +120,9 @@ data class MeasurementPoint(val uid: Int) {
             return
         }
         location = _location
-        locLatidute = _location.latitude
+        locLatitude = _location.latitude
         locLongitude = _location.longitude
-        locAltidute = _location.altitude
+        locAltitude = _location.altitude
         locAccuracy = _location.accuracy
         if (_location.hasSpeed()) {
             locSpeed = _location.speed
@@ -156,6 +182,7 @@ data class MeasurementPoint(val uid: Int) {
 //        val sdf = SimpleDateFormat("HH:mm:ssZ")
 //        val infoDate = Date(timeOfEvent)
 
+        exportedStatus = 0
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
