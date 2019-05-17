@@ -16,7 +16,6 @@
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" android:layout_marginStart="8dp" android:id="@+id/tableLayout"
             android:layout_marginTop="5dp">
-
         <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -173,6 +172,56 @@
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
         </TableRow>
+
+
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/title_prediction"
+                    android:layout_width="wrap_content"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_height="wrap_content" android:id="@+id/tvPrediction_title" android:textSize="18sp"
+                    android:textStyle="bold"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/meas_actualclass_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvActualClass_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_predictedclass_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvPredictedClass_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvActualClass"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvPredictedClass"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+
 
         <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
             <TextView
