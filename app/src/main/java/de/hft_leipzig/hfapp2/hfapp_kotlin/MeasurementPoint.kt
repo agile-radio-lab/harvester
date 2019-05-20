@@ -1,6 +1,6 @@
 package de.hft_leipzig.hfapp2.hfapp_kotlin
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import android.content.Context
 import android.location.Location
 import android.os.Build

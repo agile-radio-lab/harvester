@@ -1,14 +1,14 @@
 package de.hft_leipzig.hfapp2.hfapp_kotlin
 
 import android.app.Activity
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import android.content.Context
 import android.content.Intent
 import android.opengl.Visibility
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.*
 import android.widget.*

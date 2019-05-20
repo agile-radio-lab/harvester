@@ -2,17 +2,17 @@ package de.hft_leipzig.hfapp2.hfapp_kotlin
 
 import android.Manifest
 import android.app.*
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.*
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast

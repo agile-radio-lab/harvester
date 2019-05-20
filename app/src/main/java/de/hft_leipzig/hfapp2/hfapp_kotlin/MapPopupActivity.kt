@@ -1,11 +1,11 @@
 package de.hft_leipzig.hfapp2.hfapp_kotlin
 
 import android.app.Activity
-import android.arch.persistence.room.Room
+import androidx.room.Room
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -18,7 +18,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property
 import android.graphics.Color
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem

@@ -1,7 +1,7 @@
 package de.hft_leipzig.hfapp2.hfapp_kotlin
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
+import androidx.test.InstrumentationRegistry
+import androidx.test.runner.AndroidJUnit4
 
 import org.junit.Test
 import org.junit.runner.RunWith

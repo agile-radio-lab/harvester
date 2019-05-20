@@ -7,10 +7,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.*
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
 import java.util.*
-import android.support.v4.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -253,7 +253,7 @@ class MainActivity : AppCompatActivity() {
 
         tfInterface = TensorFlowInferenceInterface(assets, "my_model.pb")
 
-        val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
+        val pullToRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.pullToRefresh)
         pullToRefresh.setOnRefreshListener {
             getMeasurements()
             pullToRefresh.isRefreshing = false
