@@ -1,9 +1,8 @@
 version: 2
 jobs:
   build:
-    filters:
-      branches:
-        only: master
+    branches:
+      only: master
     docker:
       - image: mingc/android-build-box:latest
     steps:
