@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: mingc/android-build-box:latest
+    steps:
+      - checkout # check out the code in the project directory
+      - run: chmod +x gradlew 
+      - run: ./gradlew assembleDebug
+      - run: curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/hftloai/hfapp2/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
