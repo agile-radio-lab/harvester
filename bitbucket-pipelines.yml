@@ -8,7 +8,7 @@ pipelines:
         script:
           - chmod +x gradlew
           - ./gradlew assembleDebug
-          - echo "https://api.bitbucket.org/2.0/repositories/${REPO_PATH}/downloads"
+          - echo "${BB_AUTH_STRING}"
           - curl -X POST --user "${BB_AUTH_STRING}" "https://api.bitbucket.org/2.0/repositories/${REPO_PATH}/downloads" --form files=@"app/build/outputs/apk/debug/app-debug.apk"
         artifacts:
           - app/build/outputs/apk/debug/app-debug.apk
