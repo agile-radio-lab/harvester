@@ -1,0 +1,8 @@
+image: uber/android-build-environment:latest
+
+pipelines:
+  default:
+    - step:
+        script:
+          - y | ~/Android/Sdk/tools/bin/sdkmanager --licenses
+          - ./gradlew assembleDebug
