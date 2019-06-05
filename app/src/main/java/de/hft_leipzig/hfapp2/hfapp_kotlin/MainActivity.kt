@@ -320,6 +320,11 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(applicationContext, AboutActivity::class.java)
                 startActivity(intent)
             }
+            item.itemId == R.id.settings -> {
+                val intent = Intent(this, PreferenceActivity::class.java)
+                startActivity(intent)
+
+            }
         }
         return true
     }
