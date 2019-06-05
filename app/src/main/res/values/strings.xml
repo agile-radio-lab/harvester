@@ -77,5 +77,5 @@
     </string>
     <string name="empty_time">00:00:00</string>
 
-    <string name="upload_url">https://measurements.otc.roundeasy.ru/</string>
+    <string name="upload_url">https://pp.cloud.radiolab.ml/v1</string>
 </resources>

@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <SwitchPreference
-            app:defaultValue="true"
-            app:key="example_switch"
-            app:summary="Turn this option on or off"
-            app:title="Settings option" />
+    <EditTextPreference
+            app:defaultValue="@string/upload_url"
+            app:key="file_server_url"
+            app:summary="Enter the file server URL"
+            app:title="File server"/>
+
+    <EditTextPreference
+            app:defaultValue="test"
+            app:key="api_token"
+            app:summary="Enter your HfTL API Token"
+            app:title="API token"
+    />
+
+    <Preference app:title="Manage your API tokens" >
+        <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://auth.cloud.radiolab.ml" />
+    </Preference>
 
 </PreferenceScreen>

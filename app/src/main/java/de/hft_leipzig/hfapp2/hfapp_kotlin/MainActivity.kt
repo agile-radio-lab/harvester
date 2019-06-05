@@ -22,6 +22,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.measurement_row.*
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface
 import kotlin.collections.ArrayList
+import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
+
 
 const val PERMISSIONS_REQUEST_ALL = 0x1
 const val PERMISSIONS_REQUEST_WRITE_EXTERNAL = 0x2
@@ -239,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             PERMISSIONS_REQUEST_WRITE_EXTERNAL -> {
-                Toast.makeText(this, "Try saving file again", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Try to save again", Toast.LENGTH_LONG).show()
                 return
             }
             else -> { }
@@ -253,7 +256,7 @@ class MainActivity : AppCompatActivity() {
 
         tfInterface = TensorFlowInferenceInterface(assets, "my_model.pb")
 
-        val pullToRefresh = findViewById<androidx.swiperefreshlayout.widget.SwipeRefreshLayout>(R.id.pullToRefresh)
+        val pullToRefresh = findViewById<SwipeRefreshLayout>(R.id.pullToRefresh)
         pullToRefresh.setOnRefreshListener {
             getMeasurements()
             pullToRefresh.isRefreshing = false

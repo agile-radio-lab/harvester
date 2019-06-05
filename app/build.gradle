@@ -8,7 +8,7 @@ apply plugin: 'kotlin-kapt'
 
 ext {
     versionMajor = 1
-    versionMinor = 1
+    versionMinor = 2
     buildNum = 0
 }
 
@@ -37,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.volley:volley:1.1.1'
     api 'com.facebook.stetho:stetho:1.5.1'
     implementation 'org.tensorflow:tensorflow-android:1.13.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])

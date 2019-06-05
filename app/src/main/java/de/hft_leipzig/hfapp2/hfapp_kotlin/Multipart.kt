@@ -19,7 +19,7 @@ class Multipart
  * @throws IOException
  */
 @Throws(IOException::class)
-constructor(url: URL) {
+constructor(url: URL, apiToken: String) {
 
     companion object {
         private val LINE_FEED = "\r\n"
@@ -37,6 +37,7 @@ constructor(url: URL) {
 
         httpConnection.setRequestProperty("Accept-Charset", "UTF-8")
         httpConnection.setRequestProperty("Connection", "Keep-Alive")
+        httpConnection.setRequestProperty("X-API-Key", apiToken)
         httpConnection.setRequestProperty("Cache-Control", "no-cache")
         httpConnection.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary)
         httpConnection.setChunkedStreamingMode(maxBufferSize)
