@@ -16,9 +16,8 @@ import com.android.volley.AuthFailureError
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonArray
+import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -52,6 +51,7 @@ class SessionAdapter(private val context: Context,
         val cbSelect = rowView.findViewById(R.id.cbSelect) as CheckBox
         val ivSaved = rowView.findViewById(R.id.ivSaved) as ImageView
         val ivUploaded = rowView.findViewById(R.id.ivUploaded) as ImageView
+        val ivSync = rowView.findViewById(R.id.ivSync) as ImageView
         val sess = getItem(position) as Session
 
         titleTextView.text = sess.sessionID
@@ -61,6 +61,9 @@ class SessionAdapter(private val context: Context,
         }
         if (sess.exportedStatus!!.and(2) == 2) {
             ivUploaded.visibility = View.VISIBLE
+        }
+        if (sess.exportedStatus!!.and(4) == 4) {
+            ivSync.visibility = View.VISIBLE
         }
         titleTextView.setOnClickListener {
             val selectedSession = dataSource[position]
@@ -92,6 +95,7 @@ class SecondActivity : AppCompatActivity() {
     private var apiToken: String? = null
     private var requestQueue: RequestQueue? = null
     private var uploadFileId: String? = null
+    private var uploadAfterSave = false
 
     internal inner class GetSessionsFromDB : Runnable {
         override fun run() {
@@ -166,7 +170,6 @@ class SecondActivity : AppCompatActivity() {
         }
     }
 
-
     companion object {
         const val EXPORTED_SESSIONS = "exportedSessions"
 
@@ -229,6 +232,7 @@ class SecondActivity : AppCompatActivity() {
                     Toast.makeText(this, "Nothing to save", Toast.LENGTH_LONG).show()
                     return false
                 }
+                uploadAfterSave = false
                 saveMeasurement()
             }
             item.itemId == R.id.upload -> {
@@ -236,8 +240,8 @@ class SecondActivity : AppCompatActivity() {
                     Toast.makeText(this, "Nothing to upload", Toast.LENGTH_LONG).show()
                     return false
                 }
+                uploadAfterSave = true
                 saveMeasurement()
-                uploadMeasurement()
             }
             item.itemId == R.id.delete -> {
                 if (adapter.toExport.size == 0) {
@@ -299,13 +303,21 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun saveMeasurement() {
-        savePath = ""
-        val t = Thread(SaveMeasurementsFromDB())
-        t.start()
-        t.join()
+        doAsync {
+            savePath = ""
+            val t = Thread(SaveMeasurementsFromDB())
+            t.start()
+            t.join()
 
-        Toast.makeText(context, "Saved to $savePath", Toast.LENGTH_LONG).show()
-        updateView(1)
+            uiThread {
+                Toast.makeText(context, "Saved to $savePath", Toast.LENGTH_LONG).show()
+                updateView(1)
+                if (uploadAfterSave) {
+                    uploadMeasurement()
+                }
+            }
+        }
+
     }
 
     private fun uploadMeasurement() {
@@ -314,43 +326,31 @@ class SecondActivity : AppCompatActivity() {
             return
         }
 
-//        val future: RequestFuture<JSONObject> = RequestFuture.newFuture()
-//        val request = JsonObjectRequest("${uploadUrl}/files", JSONObject(), future, future)
-//        requestQueue?.add(request)
-//        try {
-//            val response = future.get()
-//        } catch (e: Exception) {
-//            Log.w("test", e.toString())
-//            Toast.makeText(context, "Check your internet connection, URL and the token", Toast.LENGTH_LONG).show()
-//            return
-//        }
-
-
         val file = File(savePath)
-
         val rootObject= JSONObject()
         rootObject.put("name",file.name)
-
         val arr = JSONArray()
         arr.put(rootObject)
-
-
         val jsonArrayRequest: JsonArrayRequest = object : JsonArrayRequest(
             Method.POST, "$uploadUrl/files", arr,
             Response.Listener  { response ->
                 uploadFileId = response.getJSONObject(0).getString("id")
                 errorCode = null
                 uploadResponse = null
-                val t = Thread(UploadFile())
-                t.start()
-                t.join()
 
-                if (errorCode != null) {
-                    Toast.makeText(context, "File upload failure $errorCode", Toast.LENGTH_LONG).show()
-                }
-                if (uploadResponse != null) {
-                    Toast.makeText(context, "File uploaded $savePath", Toast.LENGTH_LONG).show()
-                    updateView(2)
+                doAsync {
+                    val t = Thread(UploadFile())
+                    t.start()
+                    t.join()
+                    uiThread {
+                        if (errorCode != null) {
+                            Toast.makeText(context, "File upload failure $errorCode", Toast.LENGTH_LONG).show()
+                        }
+                        if (uploadResponse != null) {
+                            Toast.makeText(context, "File uploaded $savePath", Toast.LENGTH_LONG).show()
+                            updateView(2)
+                        }
+                    }
                 }
             },
             Response.ErrorListener { error ->
@@ -359,27 +359,12 @@ class SecondActivity : AppCompatActivity() {
         ) {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
-                var params = HashMap<String, String>()
+                val params = HashMap<String, String>()
                 params["X-API-Key"] =  apiToken!!
                 return params
             }
         }
         requestQueue?.add(jsonArrayRequest)
-//
-//
-//        errorCode = null
-//        uploadResponse = null
-//        val t = Thread(UploadFile())
-//        t.start()
-//        t.join()
-//
-//        if (errorCode != null) {
-//            Toast.makeText(context, "File upload failure $errorCode", Toast.LENGTH_LONG).show()
-//        }
-//        if (uploadResponse != null) {
-//            Toast.makeText(context, "File uploaded $savePath", Toast.LENGTH_LONG).show()
-//            updateView(2)
-//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -35,6 +35,9 @@ interface MeasurementPointDao {
     @Query("SELECT locLatitude, locLongitude FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'")
     fun getMapPointsBySessionID(sessionID: String): List<MeasurementMapPoint>
 
+    @Query("SELECT locLatitude, locLongitude FROM measurementPoint WHERE sessionID=:sessionID AND mcc!='0'  ORDER BY RANDOM() LIMIT 50")
+    fun getRandomMapPointsBySessionID(sessionID: String): List<MeasurementMapPoint>
+
     @Query("SELECT DISTINCT uid, sessionID, exportedStatus FROM measurementPoint")
     fun getAllSessions(): List<Session>
 

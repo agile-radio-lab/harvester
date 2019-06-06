@@ -23,6 +23,11 @@
                 android:gravity="center" android:text="@string/na_placeholder" android:layout_weight="1"/>
         <ImageView
                 android:layout_width="wrap_content"
+                android:layout_height="match_parent" app:srcCompat="@drawable/ic_baseline_cached_24px"
+                android:id="@+id/ivSync" android:layout_weight="0.25"
+                android:contentDescription="@string/icon_uploaded" android:visibility="invisible"/>
+        <ImageView
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent" app:srcCompat="@drawable/ic_baseline_cloud_24px"
                 android:id="@+id/ivUploaded" android:layout_weight="0.25"
                 android:contentDescription="@string/icon_uploaded" android:visibility="invisible"/>

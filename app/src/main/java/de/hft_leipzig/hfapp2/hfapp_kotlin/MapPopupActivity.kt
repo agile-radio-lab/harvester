@@ -50,7 +50,7 @@ class MapPopupActivity : AppCompatActivity() {
 
     internal inner class GetMapPointsFromDB : Runnable {
         override fun run() {
-            val listSessionList = db.measurementPointDao().getMapPointsBySessionID(sessionID)
+            val listSessionList = db.measurementPointDao().getRandomMapPointsBySessionID(sessionID)
             mapPoints = ArrayList(listSessionList)
         }
     }
