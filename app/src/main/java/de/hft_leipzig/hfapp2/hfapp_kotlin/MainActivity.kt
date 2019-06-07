@@ -26,15 +26,6 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 
 
-const val PERMISSIONS_REQUEST_ALL = 0x1
-const val PERMISSIONS_REQUEST_WRITE_EXTERNAL = 0x2
-
-var ALL_PERMISSIONS = arrayOf(
-    android.Manifest.permission.ACCESS_COARSE_LOCATION,
-    android.Manifest.permission.ACCESS_FINE_LOCATION,
-    android.Manifest.permission.READ_PHONE_STATE
-)
-
 class MainActivity : AppCompatActivity() {
     var myService: MeasurementService? = null
     var isBound = false
@@ -53,25 +44,6 @@ class MainActivity : AppCompatActivity() {
         override fun onServiceDisconnected(name: ComponentName) {
             isBound = false
         }
-    }
-
-    private fun hasPermissions(context: Context?, permissions: Array<String>): Boolean {
-        if (context != null) {
-            for (permission in permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    private fun getPermissions(permissions: Array<String>, requestID: Int): Boolean {
-        if (!hasPermissions(this, permissions)) {
-            ActivityCompat.requestPermissions(this, permissions, requestID)
-            return false
-        }
-        return true
     }
 
     private fun predict(mp: MeasurementPoint): Int {
@@ -156,8 +128,8 @@ class MainActivity : AppCompatActivity() {
                         tvPredictedClass.text = idxPredicted.toString()
                     }
                 }
-                val factory: LayoutInflater = layoutInflater
-                val rowView = factory.inflate(R.layout.measurement_row, table, false)
+                val layoutFactory: LayoutInflater = layoutInflater
+                val rowView = layoutFactory.inflate(R.layout.measurement_row, table, false)
                 val tvType = rowView.findViewById(R.id.tvType) as TextView
                 val tvBand = rowView.findViewById(R.id.tvBand) as TextView
                 val tvPci = rowView.findViewById(R.id.tvPci) as TextView
@@ -269,7 +241,7 @@ class MainActivity : AppCompatActivity() {
                 1000
             )
         }
-        if (getPermissions(ALL_PERMISSIONS, PERMISSIONS_REQUEST_ALL)) {
+        if (getPermissions(this, ALL_PERMISSIONS, PERMISSIONS_REQUEST_ALL)) {
             startOrBindMeasurementService()
         }
     }
@@ -312,7 +284,7 @@ class MainActivity : AppCompatActivity() {
             item.itemId == R.id.save -> {
                 if (isServiceRunning(MeasurementService::class.java)) {
                     if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-                        getPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        getPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                             PERMISSIONS_REQUEST_WRITE_EXTERNAL)
                         return false
                     }

@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.room.Room
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
 import com.android.volley.AuthFailureError
 import com.android.volley.RequestQueue
@@ -180,6 +182,16 @@ class SecondActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_WRITE_EXTERNAL -> {
+                Toast.makeText(this, "Try to save again", Toast.LENGTH_LONG).show()
+                return
+            }
+            else -> { }
+        }
+    }
+
     private fun getSessions() {
         val t = Thread(GetSessionsFromDB())
         t.start()
@@ -255,7 +267,7 @@ class SecondActivity : AppCompatActivity() {
 
                 builder?.apply {
                     setPositiveButton("Yes"
-                    ) { dialog, id ->
+                    ) { _, _ ->
                         deleteMeasurement()
                     }
                     setNegativeButton("No"
@@ -303,6 +315,11 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun saveMeasurement() {
+        if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+            getPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSIONS_REQUEST_WRITE_EXTERNAL)
+            return
+        }
         doAsync {
             savePath = ""
             val t = Thread(SaveMeasurementsFromDB())
