@@ -186,7 +186,7 @@ data class MeasurementPoint(val uid: Int) {
 //        val infoDate = Date(timeOfEvent)
 
         exportedStatus = 0
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
         timestamp = timeOfEvent
