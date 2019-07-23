@@ -19,6 +19,7 @@ import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.google.gson.JsonObject
 import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -91,6 +92,7 @@ class SecondActivity : AppCompatActivity() {
     private var savedExportedSessions: ArrayList<Session> = ArrayList()
     var context: Context? = null
     var savePath: String = ""
+    var savePathPing: String = ""
     var errorCode: Int? = null
     var uploadResponse: String? = null
     private var uploadUrl: String? = null
@@ -135,6 +137,18 @@ class SecondActivity : AppCompatActivity() {
                     errorCode = responseCode
                 }
             })
+
+            val filePing = File(savePath)
+            conn.addFilePart("file", filePing, filePing.name, "text/csv")
+            conn.upload(object : Multipart.OnFileUploadedListener{
+                override fun onFileUploadingSuccess(response: String) {
+                    uploadResponse = response
+                    db.pingResultDao().orExportStatusBySessionID(2, sessionIDs)
+                }
+                override fun onFileUploadingFailed(responseCode: Int) {
+                    errorCode = responseCode
+                }
+            })
         }
     }
 
@@ -148,7 +162,7 @@ class SecondActivity : AppCompatActivity() {
                 exportDir.mkdirs()
             }
 
-            val formatter = SimpleDateFormat("YYYY-MM-dd_HH-mm-ss")
+            val formatter = SimpleDateFormat("YYYY-MM-dd_HH-mm-ss", Locale.US)
             val saveFilename = "hfapp2_${formatter.format(Date())}.csv"
 
             val file = File(exportDir, saveFilename)
@@ -169,6 +183,28 @@ class SecondActivity : AppCompatActivity() {
             Log.i("Measurement saver", "Saved to ${file.absolutePath}")
             fileWriter.flush()
             fileWriter.close()
+
+
+            val saveFilenamePing = "hfapp2_${formatter.format(Date())}_ping.csv"
+            val resPing = db.pingResultDao().getAllBySessionID(sessionIDs)
+            if (resPing.count() > 0) {
+                val filePing = File(exportDir, saveFilenamePing)
+                if (!filePing.exists()) {
+                    filePing.createNewFile()
+                }
+                savePathPing = filePing.absolutePath
+                val fileWriterPing = FileWriter(filePing.absoluteFile)
+                fileWriterPing.append(CSV_HEADER_PING)
+                fileWriterPing.append('\n')
+                for (r in resPing) {
+                    fileWriterPing.append(r.toCSVRow())
+                    fileWriterPing.append('\n')
+                }
+                db.pingResultDao().orExportStatusBySessionID(1, sessionIDs)
+                Log.i("Ping results saver", "Saved to ${filePing.absolutePath}")
+                fileWriterPing.flush()
+                fileWriterPing.close()
+            }
         }
     }
 
@@ -322,6 +358,7 @@ class SecondActivity : AppCompatActivity() {
         }
         doAsync {
             savePath = ""
+            savePathPing = ""
             val t = Thread(SaveMeasurementsFromDB())
             t.start()
             t.join()
@@ -337,17 +374,25 @@ class SecondActivity : AppCompatActivity() {
 
     }
 
+    private fun createUploadObject(filePath: String): JSONObject {
+        val file = File(savePath)
+        val rootObject= JSONObject()
+        rootObject.put("name",file.name)
+        return rootObject
+    }
+
     private fun uploadMeasurement() {
         if (savePath == "") {
             Toast.makeText(context, "File to upload was not saved", Toast.LENGTH_LONG).show()
             return
         }
 
-        val file = File(savePath)
-        val rootObject= JSONObject()
-        rootObject.put("name",file.name)
         val arr = JSONArray()
-        arr.put(rootObject)
+        arr.put(createUploadObject(savePath))
+        if (savePathPing != "") {
+            arr.put(createUploadObject(savePathPing))
+        }
+
         val jsonArrayRequest: JsonArrayRequest = object : JsonArrayRequest(
             Method.POST, "$uploadUrl/files", arr,
             Response.Listener  { response ->

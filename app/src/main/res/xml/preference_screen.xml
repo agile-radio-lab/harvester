@@ -2,24 +2,69 @@
 <PreferenceScreen
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory
+            app:key="general"
+            app:title="General">
+        <EditTextPreference
+                app:defaultValue="@string/upload_url"
+                app:key="file_server_url"
+                app:summary="Enter the file server URL"
+                app:title="File server" />
 
-    <EditTextPreference
-            app:defaultValue="@string/upload_url"
-            app:key="file_server_url"
-            app:summary="Enter the file server URL"
-            app:title="File server"/>
+        <EditTextPreference
+                app:defaultValue="test"
+                app:key="api_token"
+                app:summary="Enter your HfTL API Token"
+                app:title="API token" />
 
-    <EditTextPreference
-            app:defaultValue="test"
-            app:key="api_token"
-            app:summary="Enter your HfTL API Token"
-            app:title="API token"
-    />
+        <Preference app:title="Manage your API tokens" >
+            <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://auth.cloud.radiolab.ml" />
+        </Preference>
+    </PreferenceCategory>
 
-    <Preference app:title="Manage your API tokens" >
-        <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://auth.cloud.radiolab.ml" />
-    </Preference>
+    <PreferenceCategory
+            app:key="ping"
+            app:title="Ping">
+
+        <SwitchPreference
+                app:defaultValue="true"
+                app:key="ping_enabled"
+                app:title="Enable ping"/>
+
+        <SwitchPreference
+                app:defaultValue="true"
+                app:key="ping_adaptive"
+                app:title="Adaptive ping"/>
+
+        <EditTextPreference
+                app:defaultValue="8.8.8.8"
+                app:key="ping_server"
+                app:summary="Enter the ping server"
+                app:title="Ping server"/>
+
+        <EditTextPreference
+                app:defaultValue="56"
+                app:key="ping_size"
+                android:digits="0123456789"
+                android:inputType="number"
+                app:summary="Enter packet size"
+                app:title="Packet size"/>
+
+        <EditTextPreference
+                app:defaultValue="0.2"
+                app:key="ping_interval"
+                android:inputType="numberDecimal"
+                app:summary="Enter ping interval"
+                app:title="Packet interval"/>
+
+        <EditTextPreference
+                app:defaultValue="5"
+                app:key="ping_count"
+                android:inputType="number"
+                app:summary="Number of packets to send"
+                app:title="Ping count"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>
