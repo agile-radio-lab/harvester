@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.room.Room
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -12,14 +11,12 @@ import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
 import com.android.volley.AuthFailureError
 import com.android.volley.RequestQueue
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonObject
 import org.jetbrains.anko.*
 import org.json.JSONArray
 import org.json.JSONObject

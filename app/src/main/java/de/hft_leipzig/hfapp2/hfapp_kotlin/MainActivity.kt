@@ -7,9 +7,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.*
-import androidx.core.app.ActivityCompat
 import androidx.appcompat.app.AppCompatActivity
-import java.util.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,13 +16,8 @@ import android.view.MenuItem
 import com.facebook.stetho.Stetho
 import android.view.View
 import android.widget.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.measurement_row.*
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface
 import kotlin.collections.ArrayList
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
-
 
 class MainActivity : AppCompatActivity() {
     var myService: MeasurementService? = null

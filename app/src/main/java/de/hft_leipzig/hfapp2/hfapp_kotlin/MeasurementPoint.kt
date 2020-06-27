@@ -6,7 +6,6 @@ import android.location.Location
 import android.os.Build
 import android.os.SystemClock
 import android.telephony.*
-import android.util.Log
 import android.widget.TableRow
 import android.widget.TextView
 import java.text.SimpleDateFormat

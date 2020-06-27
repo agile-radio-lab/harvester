@@ -3,7 +3,6 @@ package de.hft_leipzig.hfapp2.hfapp_kotlin
 import android.app.Activity
 import androidx.room.Room
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,15 +17,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.style.layers.LineLayer
 import com.mapbox.mapboxsdk.style.layers.Property
 import android.graphics.Color
-import androidx.appcompat.app.AlertDialog
-import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory
-
 
 class MapPopupActivity : AppCompatActivity() {
     private var mapPoints: ArrayList<MeasurementMapPoint> = ArrayList()
