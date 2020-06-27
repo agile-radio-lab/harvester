@@ -6,7 +6,6 @@ import android.location.Location
 import android.os.Build
 import android.os.SystemClock
 import android.telephony.*
-import android.util.Log
 import android.widget.TableRow
 import android.widget.TextView
 import java.text.SimpleDateFormat
@@ -70,7 +69,6 @@ data class MeasurementPoint(val uid: Int) {
     var datetime: String = ""
     var exportedStatus: Int = 0
     var type: String = ""
-    var imei: String = ""
     var status: String = NAN.toString()
     var band: Int = NAN
     var mcc: String = NAN.toString()
@@ -96,7 +94,6 @@ data class MeasurementPoint(val uid: Int) {
         res += sessionID + sep
         res += datetime + sep
         res += type + sep
-        res += imei + sep
         res += status + sep
         res += band.toString() + sep
         res += mcc + sep
@@ -182,11 +179,9 @@ data class MeasurementPoint(val uid: Int) {
     private fun parseCellInfo(cellInfo: CellInfo) {
         val millisecondsSinceEvent = (SystemClock.elapsedRealtimeNanos() - cellInfo.timeStamp) / 1000000L
         val timeOfEvent = System.currentTimeMillis() - millisecondsSinceEvent
-//        val sdf = SimpleDateFormat("HH:mm:ssZ")
-//        val infoDate = Date(timeOfEvent)
 
         exportedStatus = 0
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
         timestamp = timeOfEvent
@@ -238,7 +233,6 @@ data class MeasurementPoint(val uid: Int) {
                     mcc = cellInfo.cellIdentity.mcc.toString()
                     mnc = cellInfo.cellIdentity.mnc.toString()
                 }
-//                Log.i("meas", mcc+mnc)
             }
             is CellInfoWcdma ->  {
                 type = "WCDMA"

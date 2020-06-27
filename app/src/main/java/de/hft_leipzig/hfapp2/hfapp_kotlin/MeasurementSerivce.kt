@@ -16,17 +16,19 @@ import androidx.core.content.ContextCompat
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
+import androidx.preference.PreferenceManager
 import com.google.android.gms.location.*
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val CSV_HEADER = "timestamp,sessionID,datetime,type,imei,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
+const val CSV_HEADER = "timestamp,sessionID,datetime,type,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
 
-@Database(entities = [MeasurementPoint::class], version = 1)
+@Database(entities = [PingResult::class, MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun measurementPointDao(): MeasurementPointDao
+    abstract fun pingResultDao(): PingResultDao
 }
 
 class MeasurementService : Service() {
@@ -40,7 +42,9 @@ class MeasurementService : Service() {
     private lateinit var mNotification: Notification
 
     var isRecording = false
+    var pingThread: Thread? = null
     private var sessionID = ""
+    val pingQueue: Queue<String> = ArrayDeque<String>()
 
     private val mainHandler = Handler()
     private lateinit var backgroundTask: Runnable
@@ -53,9 +57,22 @@ class MeasurementService : Service() {
     private var mLastLocation: Location? = null
     var lastMeasurements: ArrayList<MeasurementPoint> = ArrayList()
 
+    private var pingEnabled = false
+    private var pingServer = "8.8.8.8"
+    private var pingSize = 56
+    private var pingInterval = 1.0f
+    private var pingCount = 5
+    private var pingAdaptive = false
+
     internal inner class AddMeasurementToDB(var mp: MeasurementPoint) : Runnable {
         override fun run() {
             db.measurementPointDao().insertAll(mp)
+        }
+    }
+
+    internal inner class AddPingToDB(var pr: PingResult) : Runnable {
+        override fun run() {
+            db.pingResultDao().insertAll(pr)
         }
     }
 
@@ -87,6 +104,47 @@ class MeasurementService : Service() {
         }
     }
 
+    internal inner class PingProcess : Runnable {
+        override fun run() {
+            val serverAddr = pingServer
+            val interval = pingInterval.toString()
+            val count = pingCount.toString()
+            val size = pingSize.toString()
+
+            val cmd = mutableListOf("ping", "-D")
+            cmd.addAll(arrayOf("-i", interval))
+            cmd.addAll(arrayOf("-c", count))
+            cmd.addAll(arrayOf("-s", size))
+            if (pingAdaptive) {
+                cmd.addAll(arrayOf("-A"))
+            }
+            cmd.add(serverAddr)
+
+            val builder = ProcessBuilder()
+            builder.command(cmd)
+
+            val process = builder.start()
+            val stdInput = process.inputStream.bufferedReader()
+
+            val isThreadRunning = true
+            while (isThreadRunning) {
+                val currentStr = try {
+                    stdInput.readLine()
+                } catch (e: IllegalStateException) {
+                    break
+                } ?: break
+
+                PING_REGEX.toRegex().find(currentStr) ?: continue
+
+                val pingResult = PingResult(currentStr, sessionID)
+                pingResult.newLocation(mLastLocation)
+                Thread(AddPingToDB(pingResult)).start()
+
+                pingQueue.add(currentStr)
+            }
+            process.destroy()
+        }
+    }
 
     override fun onBind(intent: Intent): IBinder? {
         return myBinder
@@ -107,9 +165,9 @@ class MeasurementService : Service() {
         isRecording = false
     }
 
-    fun newRecording() {
+    private fun newRecording() {
         startedMeasurementAt = Date()
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         sdf.timeZone = TimeZone.getTimeZone("UTC")
         val infoDate = Date()
         sessionID = "hfapp2_" + sdf.format(infoDate)
@@ -125,15 +183,25 @@ class MeasurementService : Service() {
     fun elapsed(): String {
         val diff = Date().time - startedMeasurementAt.time
         val seconds = diff / 1000
-        val seconds_show = (seconds%60).toString().padStart(2, '0')
+        val secondsShow = (seconds%60).toString().padStart(2, '0')
         val minutes = seconds / 60
-        val minutes_show = (minutes%60).toString().padStart(2, '0')
+        val minutesShow = (minutes%60).toString().padStart(2, '0')
         val hours = (minutes / 60).toString().padStart(2, '0')
-        return "$hours:$minutes_show:$seconds_show"
+        return "$hours:$minutesShow:$secondsShow"
     }
 
-    fun getMeasurements(): ArrayList<MeasurementPoint> {
+    private fun getMeasurements(): ArrayList<MeasurementPoint> {
         lastMeasurements = ArrayList()
+
+        if (pingEnabled) {
+            try{
+                if (pingThread != null && pingThread!!.isAlive) {
+                    pingThread?.join()
+                }
+            } finally {
+                pingThread = null
+            }
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
@@ -145,7 +213,12 @@ class MeasurementService : Service() {
             return lastMeasurements
         }
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            tm.signalStrength?.toString()
+        }
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         sdf.timeZone = TimeZone.getTimeZone("UTC")
         val datetime = sdf.format(Date())
 
@@ -158,15 +231,11 @@ class MeasurementService : Service() {
             mp.newLocation(mLastLocation)
             mp.datetime = datetime
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mp.imei = tm.imei
-                } else {
-                    mp.imei = tm.deviceId
-                }
-            }
             if (isRecording) {
+                if (pingEnabled) {
+                    pingThread = Thread(PingProcess())
+                    pingThread?.start()
+                }
                 Thread(AddMeasurementToDB(mp)).start()
             }
             lastMeasurements.add(mp)
@@ -208,6 +277,14 @@ class MeasurementService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         getNotification(applicationContext)
 
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        pingEnabled = prefs.getBoolean("ping_enabled", pingEnabled)
+        pingServer = prefs.getString("ping_server", pingServer)!!
+        pingSize = prefs.getString("ping_size", pingSize.toString())!!.toInt()
+        pingInterval = prefs.getString("ping_interval", pingInterval.toString())!!.toFloat()
+        pingCount = prefs.getString("ping_count", pingCount.toString())!!.toInt()
+        pingAdaptive = prefs.getBoolean("ping_adaptive", pingAdaptive)
+
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         startedMeasurementAt = Date()
@@ -223,7 +300,6 @@ class MeasurementService : Service() {
         backgroundTask.run()
 
 //        this.deleteDatabase("measurements")
-//        this.deleteDatabase("database-name2")
         db = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "measurements"
