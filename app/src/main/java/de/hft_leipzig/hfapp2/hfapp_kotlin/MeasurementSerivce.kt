@@ -23,7 +23,7 @@ import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val CSV_HEADER = "timestamp,sessionID,datetime,type,imei,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
+const val CSV_HEADER = "timestamp,sessionID,datetime,type,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
 
 @Database(entities = [PingResult::class, MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -231,14 +231,6 @@ class MeasurementService : Service() {
             mp.newLocation(mLastLocation)
             mp.datetime = datetime
 
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    mp.imei = tm.imei
-                } else {
-                    mp.imei = tm.deviceId
-                }
-            }
             if (isRecording) {
                 if (pingEnabled) {
                     pingThread = Thread(PingProcess())
@@ -308,7 +300,6 @@ class MeasurementService : Service() {
         backgroundTask.run()
 
 //        this.deleteDatabase("measurements")
-//        this.deleteDatabase("database-name2")
         db = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "measurements"
