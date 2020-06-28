@@ -34,7 +34,7 @@
                     android:layout_height="wrap_content" android:id="@+id/textView5"
                     android:layout_weight="0.5"/>
             <TextView
-                    android:text="kim@hft-leipzig.de"
+                    android:text="@string/support_email"
                     android:layout_width="0dp"
                     android:autoLink="email"
 
