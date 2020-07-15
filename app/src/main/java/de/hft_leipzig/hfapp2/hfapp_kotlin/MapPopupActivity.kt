@@ -73,8 +73,8 @@ class MapPopupActivity : AppCompatActivity() {
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         setContentView(R.layout.activity_map_popup)
 
-        sessionID = intent.extras.getString(SESSION_ID)
-        exportedSessions = intent.extras.getParcelableArrayList<Session>(EXPORTED_SESSIONS)
+        sessionID = intent.extras?.getString(SESSION_ID).toString()
+        exportedSessions = intent.extras?.getParcelableArrayList<Session>(EXPORTED_SESSIONS) as ArrayList<Session>
         db = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "measurements"

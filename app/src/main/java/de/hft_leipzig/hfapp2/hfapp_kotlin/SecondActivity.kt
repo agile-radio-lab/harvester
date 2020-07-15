@@ -318,7 +318,7 @@ class SecondActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1) {
             if (resultCode == Activity.RESULT_OK && data != null) {
-                savedExportedSessions = data.getParcelableArrayListExtra<Session>(EXPORTED_SESSIONS)
+                savedExportedSessions = data.getParcelableArrayListExtra<Session>(EXPORTED_SESSIONS) as ArrayList<Session>
             }
         }
     }
