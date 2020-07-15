@@ -23,7 +23,7 @@ import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
-const val CSV_HEADER = "timestamp,sessionID,datetime,type,status,band,mcc,mnc,pci,rsrp,rsrq,asu,rssnr,ta,cqi,ci,lat,lon,alt,acc,speed,speed_acc"
+const val CSV_HEADER = "timestamp;sessionID;datetime;type;status;band;mcc;mnc;pci;rsrp;rsrq;asu;rssnr;ta;cqi;ci;lat;lon;alt;acc;speed;speed_acc;rssi;bw"
 
 @Database(entities = [PingResult::class, MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {

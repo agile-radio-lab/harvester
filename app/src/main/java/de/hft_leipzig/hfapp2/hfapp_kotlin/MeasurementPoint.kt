@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.telephony.*
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -87,9 +88,11 @@ data class MeasurementPoint(val uid: Int) {
     var locAccuracy: Float = NAN_F
     var locSpeed: Float = NAN_F
     var locSpeedAcc: Float = NAN_F
+    var rssi: Int = NAN
+    var bw: Int = NAN
     @Ignore var location: Location? = null
 
-    fun toCSVRow(sep: String? = ","): String {
+    fun toCSVRow(sep: String? = ";"): String {
         var res = timestamp.toString() + sep
         res += sessionID + sep
         res += datetime + sep
@@ -112,6 +115,8 @@ data class MeasurementPoint(val uid: Int) {
         res += locAccuracy.toString() + sep
         res += locSpeed.toString() + sep
         res += locSpeedAcc.toString() + sep
+        res += rssi.toString() + sep
+        res += bw.toString()
         return res
     }
 
@@ -204,6 +209,18 @@ data class MeasurementPoint(val uid: Int) {
         }
 
         when (cellInfo) {
+//            is CellInfoNr -> {
+//                type = "NR"
+//                if (cellInfo.cellSignalStrength is CellSignalStrengthNr) {
+//                    rsrp = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrp
+//                    rsrq = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrq
+//                    rssnr = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssSinr
+//                    pci = (cellInfo.cellIdentity as CellIdentityNr).pci
+//                    band = (cellInfo.cellIdentity as CellIdentityNr).nrarfcn
+//                    mcc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
+//                    mnc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
+//                }
+//            }
             is CellInfoLte -> {
                 type = "LTE"
                 band = cellInfo.cellIdentity.earfcn
@@ -218,17 +235,21 @@ data class MeasurementPoint(val uid: Int) {
                     rssnr = cellInfo.cellSignalStrength.rssnr
                     cqi = cellInfo.cellSignalStrength.cqi
                 }
+                if (Build.VERSION.SDK_INT >= 29) {
+                    rssi = cellInfo.cellSignalStrength.rssi
+                }
                 if (Build.VERSION.SDK_INT >= 28) {
                     mcc = if (cellInfo.cellIdentity.mccString != null) {
-                        cellInfo.cellIdentity.mccString
+                        cellInfo.cellIdentity.mccString!!
                     } else {
                         NAN.toString()
                     }
                     mnc = if (cellInfo.cellIdentity.mncString != null) {
-                        cellInfo.cellIdentity.mncString
+                        cellInfo.cellIdentity.mncString!!
                     } else {
                         NAN.toString()
                     }
+                    bw = cellInfo.cellIdentity.bandwidth
                 } else {
                     mcc = cellInfo.cellIdentity.mcc.toString()
                     mnc = cellInfo.cellIdentity.mnc.toString()
@@ -243,12 +264,12 @@ data class MeasurementPoint(val uid: Int) {
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     mcc = if (cellInfo.cellIdentity.mccString != null) {
-                        cellInfo.cellIdentity.mccString
+                        cellInfo.cellIdentity.mccString!!
                     } else {
                         NAN.toString()
                     }
                     mnc = if (cellInfo.cellIdentity.mncString != null) {
-                        cellInfo.cellIdentity.mncString
+                        cellInfo.cellIdentity.mncString!!
                     } else {
                         NAN.toString()
                     }
@@ -266,12 +287,12 @@ data class MeasurementPoint(val uid: Int) {
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     mcc = if (cellInfo.cellIdentity.mccString != null) {
-                        cellInfo.cellIdentity.mccString
+                        cellInfo.cellIdentity.mccString!!
                     } else {
                         NAN.toString()
                     }
                     mnc = if (cellInfo.cellIdentity.mncString != null) {
-                        cellInfo.cellIdentity.mncString
+                        cellInfo.cellIdentity.mncString!!
                     } else {
                         NAN.toString()
                     }
@@ -288,7 +309,6 @@ data class MeasurementPoint(val uid: Int) {
                 asu = cellInfo.cellSignalStrength.asuLevel
                 rsrp = cellInfo.cellSignalStrength.dbm
                 ci = cellInfo.cellIdentity.basestationId
-
             }
         }
     }
