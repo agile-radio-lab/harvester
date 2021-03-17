@@ -181,6 +181,7 @@ data class MeasurementPoint(val uid: Int) {
         return row
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun parseCellInfo(cellInfo: CellInfo) {
         val millisecondsSinceEvent = (SystemClock.elapsedRealtimeNanos() - cellInfo.timeStamp) / 1000000L
         val timeOfEvent = System.currentTimeMillis() - millisecondsSinceEvent
@@ -209,18 +210,19 @@ data class MeasurementPoint(val uid: Int) {
         }
 
         when (cellInfo) {
-//            is CellInfoNr -> {
-//                type = "NR"
-//                if (cellInfo.cellSignalStrength is CellSignalStrengthNr) {
-//                    rsrp = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrp
-//                    rsrq = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrq
-//                    rssnr = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssSinr
-//                    pci = (cellInfo.cellIdentity as CellIdentityNr).pci
-//                    band = (cellInfo.cellIdentity as CellIdentityNr).nrarfcn
-//                    mcc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
-//                    mnc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
-//                }
-//            }
+            is CellInfoNr -> {
+                type = "NR"
+                if (cellInfo.cellSignalStrength is CellSignalStrengthNr) {
+                    rsrp = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrp
+                    rsrq = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssRsrq
+                    rssnr = (cellInfo.cellSignalStrength as CellSignalStrengthNr).ssSinr
+                    asu = (cellInfo.cellSignalStrength as CellSignalStrengthNr).asuLevel
+                    pci = (cellInfo.cellIdentity as CellIdentityNr).pci
+                    band = (cellInfo.cellIdentity as CellIdentityNr).nrarfcn
+                    mcc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
+                    mnc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
+                }
+            }
             is CellInfoLte -> {
                 type = "LTE"
                 band = cellInfo.cellIdentity.earfcn
