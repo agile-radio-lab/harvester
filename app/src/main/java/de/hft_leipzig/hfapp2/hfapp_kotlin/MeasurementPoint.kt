@@ -220,7 +220,7 @@ data class MeasurementPoint(val uid: Int) {
                     pci = (cellInfo.cellIdentity as CellIdentityNr).pci
                     band = (cellInfo.cellIdentity as CellIdentityNr).nrarfcn
                     mcc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
-                    mnc = (cellInfo.cellIdentity as CellIdentityNr).mccString.toString()
+                    mnc = (cellInfo.cellIdentity as CellIdentityNr).mncString.toString()
                 }
             }
             is CellInfoLte -> {
