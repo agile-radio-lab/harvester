@@ -6,12 +6,8 @@ Application has integrated ICMP ping, it supports export of results to CSV.
 
 Main view:
 ![Main Screen](public/main_screen.jpg)
-
-Settings view:
 ![Settings Screen](public/export.jpg)
-
-Export view:
-![Settings Screen](public/settings.jpg)
+![Export Screen](public/settings.jpg)
 
 ## Copyright
 Developer: Igor Kim
