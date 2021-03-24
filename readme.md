@@ -4,7 +4,8 @@ Android application for LTE/5G NR measurements using Android API. Application co
 
 Application has integrated ICMP ping, it supports export of results to CSV.
 
-Main view:
+
+
 ![Main Screen](public/main_screen.jpg)
 ![Settings Screen](public/export.jpg)
 ![Export Screen](public/settings.jpg)
