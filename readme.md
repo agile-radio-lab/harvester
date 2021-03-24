@@ -1,5 +1,15 @@
 # HTWK Signal Harvester
 
+Android application for LTE/5G NR measurements using Android API. Application collects [cell information](https://developer.android.com/reference/android/telephony/CellInfo), [cell signal strength](https://developer.android.com/reference/android/telephony/CellSignalStrength) along with location information from GPS. Availability of metrics depends on smartphone and operating system.
+
+Application has integrated ICMP ping, it supports export of results to CSV.
+
+
+
+![Main Screen](public/main_screen.jpg)
+![Settings Screen](public/export.jpg)
+![Export Screen](public/settings.jpg)
+
 ## Copyright
 Developer: Igor Kim
 
