@@ -76,34 +76,6 @@ class MeasurementService : Service() {
         }
     }
 
-    internal inner class GetMeasurementsFromDB : Runnable {
-        override fun run() {
-            val exportDir =  File(Environment.getExternalStorageDirectory(), "")
-            Log.i("Measurement service", exportDir.absolutePath)
-
-            if (!exportDir.exists()) {
-                exportDir.mkdirs()
-            }
-
-            val file = File(exportDir, "csvname.csv")
-            if (!file.exists()) {
-                file.createNewFile()
-            }
-
-            val fileWriter = FileWriter(file.absoluteFile)
-            fileWriter.append(CSV_HEADER)
-            fileWriter.append('\n')
-            val res = db.measurementPointDao().getAll()
-            for (r in res) {
-                Log.i("Measurement service", r.sessionID)
-                fileWriter.append(r.toCSVRow())
-                fileWriter.append('\n')
-            }
-            fileWriter.flush()
-            fileWriter.close()
-        }
-    }
-
     internal inner class PingProcess : Runnable {
         override fun run() {
             val serverAddr = pingServer
@@ -154,10 +126,6 @@ class MeasurementService : Service() {
         override fun onLocationResult(locationResult: LocationResult) {
             mLastLocation = locationResult.lastLocation
         }
-    }
-
-    fun saveMeasurement() {
-        Thread(GetMeasurementsFromDB()).start()
     }
 
     fun stopMeasurement() {

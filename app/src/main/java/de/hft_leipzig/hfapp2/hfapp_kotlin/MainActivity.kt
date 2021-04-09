@@ -274,16 +274,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         super.onOptionsItemSelected(item)
         when {
-            item.itemId == R.id.save -> {
-                if (isServiceRunning(MeasurementService::class.java)) {
-                    if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-                        getPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                            PERMISSIONS_REQUEST_WRITE_EXTERNAL)
-                        return false
-                    }
-                    myService?.saveMeasurement()
-                }
-            }
             item.itemId == R.id.about -> {
                 val intent = Intent(applicationContext, AboutActivity::class.java)
                 startActivity(intent)

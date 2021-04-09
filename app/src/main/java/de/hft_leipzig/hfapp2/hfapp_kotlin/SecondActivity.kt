@@ -154,7 +154,8 @@ class SecondActivity : AppCompatActivity() {
             val sessionIDs = Array(adapter.toExport.size) {
                 adapter.toExport[it].sessionID!!
             }
-            val exportDir =  File(Environment.getExternalStorageDirectory(), "")
+
+            val exportDir = File(context?.getExternalFilesDir(null)?.absolutePath.toString(), "")
             if (!exportDir.exists()) {
                 exportDir.mkdirs()
             }
@@ -348,8 +349,12 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun saveMeasurement() {
-        if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-            getPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+        if (!hasPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))) {
+            val permissions = arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            getPermissions(this, permissions,
                 PERMISSIONS_REQUEST_WRITE_EXTERNAL)
             return
         }
