@@ -11,9 +11,9 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.*
+import android.telephony.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.telephony.TelephonyManager
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -22,8 +22,17 @@ import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.annotation.RequiresApi
+import java.lang.Exception
+import java.lang.reflect.Method
+
 
 const val CSV_HEADER = "timestamp;sessionID;datetime;type;status;band;mcc;mnc;pci;rsrp;rsrq;asu;rssnr;ta;cqi;ci;lat;lon;alt;acc;speed;speed_acc;rssi;bw"
+
+private const val LTE_TAG = "LTE_Tag"
+private const val LTE_SIGNAL_STRENGTH = "getLteSignalStrength"
+
+private var signalStrength: SignalStrength? = null
 
 @Database(entities = [PingResult::class, MeasurementPoint::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
@@ -226,18 +235,41 @@ class MeasurementService : Service() {
             if (cellInfo == null) {
                 continue
             }
-            val mp = MeasurementPoint(cellInfo)
-            mp.sessionID = sessionID
-            mp.newLocation(mLastLocation)
-            mp.datetime = datetime
 
-            if (isRecording) {
+            val mp = MeasurementPoint(cellInfo)
+
+            when (cellInfo) {
+                is CellInfoLte ->{
+                    mp.sessionID = sessionID
+                    mp.newLocation(mLastLocation)
+                    mp.datetime = datetime
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        Log.i("measurements","getLTEsignalStrength(): "+tm.signalStrength?.cellSignalStrengths?.toString())
+                        val signalStrength = tm.signalStrength?.cellSignalStrengths?.get(0).toString().split(": ")[1].split(" ")
+
+                        for (i in signalStrength) {
+                            if ("rssnr" in i){
+                                mp.rssnr = i.split("=")[1].toDouble()/10
+                            }
+                            if ("level" in i){
+                                mp.lvl = i.split("=")[1].toInt()
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+              if (isRecording) {
                 if (pingEnabled) {
                     pingThread = Thread(PingProcess())
                     pingThread?.start()
                 }
                 Thread(AddMeasurementToDB(mp)).start()
             }
+
             lastMeasurements.add(mp)
         }
         return lastMeasurements
@@ -274,6 +306,22 @@ class MeasurementService : Service() {
         }
     }
 
+    private fun getLTEsignalStrength() {
+        try {
+            val methods: Array<Method> = SignalStrength::class.java.methods
+            for (mthd in methods) {
+                if (mthd.getName().equals(LTE_SIGNAL_STRENGTH)) {
+                    val LTEsignalStrength = mthd.invoke(signalStrength, arrayOf<Any>()) as Int
+                    Log.i(LTE_TAG, "signalStrength = $LTEsignalStrength")
+                    return
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(LTE_TAG, "Exception: $e")
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         getNotification(applicationContext)
 
@@ -286,6 +334,20 @@ class MeasurementService : Service() {
         pingAdaptive = prefs.getBoolean("ping_adaptive", pingAdaptive)
 
         tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+        // Listener for the signal strength.
+        val mListener: PhoneStateListener = object : PhoneStateListener() {
+            override fun onSignalStrengthsChanged(sStrength: SignalStrength) {
+                signalStrength = sStrength
+                getLTEsignalStrength()
+            }
+        }
+
+
+        // Register the listener for the telephony manager
+        tm.listen(mListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
+
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         startedMeasurementAt = Date()
 
