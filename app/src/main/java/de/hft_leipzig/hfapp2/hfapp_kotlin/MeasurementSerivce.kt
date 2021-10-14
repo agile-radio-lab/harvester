@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
+import android.location.LocationManager
 import android.os.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -76,34 +77,6 @@ class MeasurementService : Service() {
         }
     }
 
-    internal inner class GetMeasurementsFromDB : Runnable {
-        override fun run() {
-            val exportDir =  File(Environment.getExternalStorageDirectory(), "")
-            Log.i("Measurement service", exportDir.absolutePath)
-
-            if (!exportDir.exists()) {
-                exportDir.mkdirs()
-            }
-
-            val file = File(exportDir, "csvname.csv")
-            if (!file.exists()) {
-                file.createNewFile()
-            }
-
-            val fileWriter = FileWriter(file.absoluteFile)
-            fileWriter.append(CSV_HEADER)
-            fileWriter.append('\n')
-            val res = db.measurementPointDao().getAll()
-            for (r in res) {
-                Log.i("Measurement service", r.sessionID)
-                fileWriter.append(r.toCSVRow())
-                fileWriter.append('\n')
-            }
-            fileWriter.flush()
-            fileWriter.close()
-        }
-    }
-
     internal inner class PingProcess : Runnable {
         override fun run() {
             val serverAddr = pingServer
@@ -150,15 +123,10 @@ class MeasurementService : Service() {
         return myBinder
     }
 
-    private val mLocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            mLastLocation = locationResult.lastLocation
+    private val mLocationListener =
+        android.location.LocationListener {
+                location -> mLastLocation = location
         }
-    }
-
-    fun saveMeasurement() {
-        Thread(GetMeasurementsFromDB()).start()
-    }
 
     fun stopMeasurement() {
         sessionID = ""
@@ -244,28 +212,21 @@ class MeasurementService : Service() {
     }
 
     private fun startLocationUpdates() {
-        mLocationRequest = LocationRequest()
-        mLocationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        mLocationRequest.interval = interval
-        mLocationRequest.fastestInterval = fastestInterval
-
-        val builder = LocationSettingsRequest.Builder()
-        builder.addLocationRequest(mLocationRequest)
-        val locationSettingsRequest = builder.build()
-
-        val settingsClient = LocationServices.getSettingsClient(this)
-        settingsClient.checkLocationSettings(locationSettingsRequest)
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
             && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
 
             return
         }
-        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest, mLocationCallback,
-            Looper.myLooper())
+
+        val mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        mLocationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER, 0L,
+            0f, mLocationListener)
     }
 
     inner class MyLocalBinder : Binder() {
