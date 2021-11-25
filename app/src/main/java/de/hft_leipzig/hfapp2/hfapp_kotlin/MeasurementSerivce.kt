@@ -16,12 +16,9 @@ import android.os.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.telephony.TelephonyManager
-import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.*
-import java.io.File
-import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
