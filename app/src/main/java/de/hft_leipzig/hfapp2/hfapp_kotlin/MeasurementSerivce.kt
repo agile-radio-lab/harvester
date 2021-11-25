@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import android.os.*
@@ -224,8 +225,12 @@ class MeasurementService : Service() {
         }
 
         val mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE;
+
         mLocationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER, 0L,
+            mLocationManager.getBestProvider(criteria, true) ?: LocationManager.GPS_PROVIDER,
+            0L,
             0f, mLocationListener)
     }
 
