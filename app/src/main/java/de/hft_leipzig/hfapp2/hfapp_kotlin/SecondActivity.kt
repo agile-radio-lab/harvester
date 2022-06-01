@@ -151,6 +151,7 @@ class SecondActivity : AppCompatActivity() {
 
     internal inner class SaveMeasurementsFromDB : Runnable {
         override fun run() {
+            Log.i("Measurementsaver", "STARTED")
             val sessionIDs = Array(adapter.toExport.size) {
                 adapter.toExport[it].sessionID!!
             }
@@ -163,7 +164,9 @@ class SecondActivity : AppCompatActivity() {
             val formatter = SimpleDateFormat("YYYY-MM-dd_HH-mm-ss", Locale.US)
             val saveFilename = "hfapp2_${formatter.format(Date())}.csv"
 
+            val exportDir = context!!.getExternalFilesDir(null)
             val file = File(exportDir, saveFilename)
+
             if (!file.exists()) {
                 file.createNewFile()
             }
@@ -349,12 +352,9 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun saveMeasurement() {
-        if (!hasPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))) {
-            val permissions = arrayOf(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            getPermissions(this, permissions,
+        Log.i("Measurement saver","GO into fun")
+        if (!hasPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+            getPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 PERMISSIONS_REQUEST_WRITE_EXTERNAL)
             return
         }

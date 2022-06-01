@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Build
 import android.os.SystemClock
 import android.telephony.*
+import android.util.Log
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -78,7 +79,8 @@ data class MeasurementPoint(val uid: Int) {
     var rsrp: Int = NAN
     var rsrq: Int = NAN
     var asu: Int = NAN
-    var rssnr: Int = NAN
+    var rssnr: Double = NAN.toDouble()
+    var lvl: Int = NAN
     var ta: Int = NAN
     var cqi: Int = NAN
     var ci: Int = NAN
@@ -89,7 +91,9 @@ data class MeasurementPoint(val uid: Int) {
     var locSpeed: Float = NAN_F
     var locSpeedAcc: Float = NAN_F
     var rssi: Int = NAN
-    var bw: Int = NAN
+    var bw: Double = NAN.toDouble()
+    var dbm: Int = NAN
+
     @Ignore var location: Location? = null
 
     fun toCSVRow(sep: String? = ";"): String {
@@ -151,6 +155,9 @@ data class MeasurementPoint(val uid: Int) {
         return if (valueToConv == NAN) "NaN" else valueToConv.toString()
     }
 
+    fun strOrNan(valueToConv: Double): String {
+        return if (valueToConv == NAN.toDouble()) "NaN" else valueToConv.toString()
+    }
 
     fun strOrNan(valueToConv: String): String {
         return if (valueToConv == NAN.toString()) "NaN" else valueToConv
@@ -167,7 +174,6 @@ data class MeasurementPoint(val uid: Int) {
         columns.add(createTextViewCell(context, strOrNan(status), rightPadding, fontSize))
         columns.add(createTextViewCell(context, strOrNan(band), rightPadding, fontSize))
         columns.add(createTextViewCell(context, strOrNan(pci), rightPadding, fontSize))
-
         columns.add(createTextViewCell(context, strOrNan(rsrp), rightPadding, fontSize))
         columns.add(createTextViewCell(context, strOrNan(rsrq), rightPadding, fontSize))
         columns.add(createTextViewCell(context, strOrNan(rssnr), rightPadding, fontSize))
@@ -224,23 +230,26 @@ data class MeasurementPoint(val uid: Int) {
                 }
             }
             is CellInfoLte -> {
+                Log.i("measurements","cellinfo: "+cellInfo.toString())
                 type = "LTE"
                 band = cellInfo.cellIdentity.earfcn
                 pci = cellInfo.cellIdentity.pci
                 asu = cellInfo.cellSignalStrength.asuLevel
                 ci = cellInfo.cellIdentity.ci
                 ta = cellInfo.cellSignalStrength.timingAdvance
+                dbm = cellInfo.cellSignalStrength.dbm
 
                 if (Build.VERSION.SDK_INT >= 26) {
                     rsrp = cellInfo.cellSignalStrength.rsrp
                     rsrq = cellInfo.cellSignalStrength.rsrq
-                    rssnr = cellInfo.cellSignalStrength.rssnr
+                    //rssnr = cellInfo.cellSignalStrength.rssnr.toDouble()
                     cqi = cellInfo.cellSignalStrength.cqi
                 }
                 if (Build.VERSION.SDK_INT >= 29) {
                     rssi = cellInfo.cellSignalStrength.rssi
                 }
                 if (Build.VERSION.SDK_INT >= 28) {
+                    bw = cellInfo.cellIdentity.bandwidth/1000.0
                     mcc = if (cellInfo.cellIdentity.mccString != null) {
                         cellInfo.cellIdentity.mccString!!
                     } else {
@@ -251,7 +260,6 @@ data class MeasurementPoint(val uid: Int) {
                     } else {
                         NAN.toString()
                     }
-                    bw = cellInfo.cellIdentity.bandwidth
                 } else {
                     mcc = cellInfo.cellIdentity.mcc.toString()
                     mnc = cellInfo.cellIdentity.mnc.toString()

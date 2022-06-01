@@ -16,6 +16,7 @@
     <string name="title_empty">0</string>
     <string name="title_neighbours">All Cells</string>
     <string name="title_serving">Serving Cell</string>
+    <string name="title_estimation">Estimation</string>
     <string name="title_location">Location</string>
     <string name="title_prediction">Classifier</string>
     <string name="dialog_message">Are you sure you want to delete this measurement?</string>
@@ -45,11 +46,20 @@
     <string name="meas_rsrp_label">RSRP</string>
     <string name="meas_rsrq_label">RSRQ</string>
     <string name="meas_rssnr_label">RSSNR</string>
+    <string name="meas_dbm_label">Dbm</string>
+    <string name="meas_lvl_label">Level</string>
+    <string name="meas_rssi_label">RSSI</string>
     <string name="meas_rssnr_label_long">Reference Signal Signal to Noise Ratio</string>
     <string name="meas_cqi_label">CQI</string>
     <string name="meas_cqi_label_long">Channgel Quality Indicator</string>
     <string name="meas_ta_label">TA</string>
+    <string name="meas_bw_label">BW</string>
     <string name="meas_ta_label_long">Timing Advance</string>
+
+    <string name="meas_avb1_label">LOS</string>
+    <string name="meas_avb2_label">RB</string>
+    <string name="meas_avb3_label">AVB</string>
+    <string name="meas_avb4_label">DELAY</string>
 
     <string name="meas_status_label">Status</string>
     <string name="meas_freq_label">Band</string>

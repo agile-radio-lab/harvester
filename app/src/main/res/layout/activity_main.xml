@@ -16,6 +16,8 @@
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" android:layout_marginStart="8dp" android:id="@+id/tableLayout"
             android:layout_marginTop="5dp">
+
+
         <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -93,6 +95,11 @@
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
         </TableRow>
+
+
+
+
+
         <TableRow
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -113,14 +120,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_weight="1"/>
-            <TextView
-                    android:text="@string/meas_rssnr_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvRssnr_label"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
-                    android:layout_weight="1"/>
+
             <TextView
                     android:text="@string/meas_ta_label"
                     android:layout_width="0dp"
@@ -137,6 +137,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_lvl_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvLvl_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+
         </TableRow>
         <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
             <TextView
@@ -147,14 +156,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:layout_weight="1"/>
-            <TextView
-                    android:text="@string/na_placeholder"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tvRssnr"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
-                    android:layout_weight="1"/>
+
             <TextView
                     android:text="@string/na_placeholder"
                     android:layout_width="0dp"
@@ -171,6 +173,198 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
                     android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvLvl"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+
+        </TableRow>
+
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+            <TextView
+                    android:id="@+id/tvRssi_label"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meas_rssi_label"
+                    android:layout_width="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:id="@+id/tvRsrp_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meas_rsrp_label"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:id="@+id/tvRsrq_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meas_rsrq_label"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:id="@+id/tvRssnr_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/meas_rssnr_label"
+                    android:layout_weight="1" />
+            <TextView
+                    android:text="@string/meas_bw_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvBw_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <TextView
+                    android:id="@+id/tvRssi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/na_placeholder"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                    android:id="@+id/tvRsrp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na_placeholder" />
+
+            <TextView
+                    android:id="@+id/tvRsrq"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na_placeholder" />
+
+            <TextView
+                    android:id="@+id/tvRssnr"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/na_placeholder" />
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvBw"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+        </TableRow>
+
+
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/title_estimation"
+                    android:layout_width="wrap_content"
+
+                    android:layout_marginTop="10dp"
+                    android:layout_height="wrap_content" android:id="@+id/tvEstimation_title" android:textSize="18sp"
+                    android:textStyle="bold"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/meas_avb1_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb1_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:text="@string/meas_avb2_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb2_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_avb3_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb3_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/meas_avb4_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb4_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_weight="1"/>
+
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb3"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+            <TextView
+                    android:text="@string/na_placeholder"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tvAvb4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
+                    android:layout_weight="1"/>
+
         </TableRow>
 
 
@@ -223,16 +417,20 @@
         </TableRow>
 
 
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
             <TextView
-                    android:text="@string/na_placeholder"
+                    android:id="@+id/tvTime"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
                     android:layout_marginTop="10dp"
-                    android:id="@+id/tvTime"
+                    android:layout_weight="1"
+                    android:text="@string/na_placeholder"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="0dp"
-                    android:layout_weight="1"/>
+                    app:layout_constraintTop_toTopOf="parent" />
         </TableRow>
     </TableLayout>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

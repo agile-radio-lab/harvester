@@ -18,6 +18,7 @@ import android.view.View
 import android.widget.*
 import org.tensorflow.contrib.android.TensorFlowInferenceInterface
 import kotlin.collections.ArrayList
+import kotlinx.android.synthetic.main.measurement_row.*
 
 class MainActivity : AppCompatActivity() {
     var myService: MeasurementService? = null
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         return maxIdx
     }
 
-    private fun getSnrIndex(sinrVal: Int): Int {
+    private fun getSnrIndex(sinrVal: Double): Int {
         val range: ArrayList<Int> = arrayListOf(-13,  -1,  11,  23,  35)
         var idx = 0
         for (r in range) {
@@ -86,8 +87,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             val measurements = myService?.lastMeasurements
+            Log.i("measurements","val measurements = "+measurements.toString())
             for (mp in measurements!!) {
                 if (mp.mcc != "0" && mp.mnc != "0" && mp.mnc != NAN.toString() && mp.mnc != NAN.toString()) {
+                    if (mp.ta != NAN){
+                        Log.i("measurements_achtung","ACHTUNG HERE IS TAAA!!!!: "+mp.ta.toString()+" ON THE "+mp.band.toString()+" BAND")
+                    }
+                    if (mp.rssi == NAN){
+                        continue
+                    }
                     val tvNetwork = findViewById<TextView>(R.id.tvNetwork)
                     val tvLatitude = findViewById<TextView>(R.id.tvLatitude)
                     val tvLongitude = findViewById<TextView>(R.id.tvLongitude)
@@ -105,15 +113,32 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val tvCqi = findViewById<TextView>(R.id.tvCqi)
-                    val tvRssnr = findViewById<TextView>(R.id.tvRssnr)
                     val tvTa = findViewById<TextView>(R.id.tvTa)
-                    tvCqi.text = mp.strOrNan(mp.cqi)
-                    tvRssnr.text = mp.strOrNan(mp.rssnr)
-                    tvTa.text = mp.strOrNan(mp.ta)
+                    val tvRssnr = findViewById<TextView>(R.id.tvRssnr)
+                    val tvRssi = findViewById<TextView>(R.id.tvRssi)
+                    val tvRsrp = findViewById<TextView>(R.id.tvRsrp)
+                    val tvRsrq = findViewById<TextView>(R.id.tvRsrq)
+//                    val tvDbm = findViewById<TextView>(R.id.tvDbm)
+                    val tvBw = findViewById<TextView>(R.id.tvBw)
+                    val tvLvl = findViewById<TextView>(R.id.tvLvl)
 
+                    tvCqi.text = mp.strOrNan(mp.cqi)
+                    if (mp.cqi != NAN) {
+                        tvTa.text = mp.strOrNan(mp.cqi)
+                    }
+                    tvRssnr.text = mp.strOrNan(mp.rssnr)
+                    if (mp.ta != NAN) {
+                        tvTa.text = mp.strOrNan(mp.ta)
+                    }
+                    tvRssi.text = mp.strOrNan(mp.rssi)
+                    tvRsrp.text = mp.strOrNan(mp.rsrp)
+                    tvRsrq.text = mp.strOrNan(mp.rsrq)
+//                    tvDbm.text = mp.strOrNan(mp.dbm)
+                    tvBw.text = mp.strOrNan(mp.bw)
+                    tvLvl.text = mp.strOrNan(mp.lvl)
+                    
                     val idxActual = getSnrIndex(mp.rssnr)
                     val idxPredicted = predict(mp)
-
                     if (mp.rssnr < NAN) {
                         val tvActualClass = findViewById<TextView>(R.id.tvActualClass)
                         val tvPredictedClass = findViewById<TextView>(R.id.tvPredictedClass)
@@ -129,6 +154,9 @@ class MainActivity : AppCompatActivity() {
                 val tvRsrp = rowView.findViewById(R.id.tvRsrp) as TextView
                 val tvRsrq = rowView.findViewById(R.id.tvRsrq) as TextView
                 val tvAsu = rowView.findViewById(R.id.tvAsu) as TextView
+
+
+
                 tvType.text = mp.strOrNan(mp.type)
                 tvBand.text = mp.strOrNan(mp.band)
                 tvPci.text = mp.strOrNan(mp.pci)
