@@ -9,18 +9,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import android.os.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.telephony.TelephonyManager
-import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.*
-import java.io.File
-import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -224,8 +222,12 @@ class MeasurementService : Service() {
         }
 
         val mLocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val criteria = Criteria()
+        criteria.accuracy = Criteria.ACCURACY_FINE;
+
         mLocationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER, 0L,
+            mLocationManager.getBestProvider(criteria, true) ?: LocationManager.GPS_PROVIDER,
+            0L,
             0f, mLocationListener)
     }
 
